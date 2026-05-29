@@ -4,8 +4,11 @@ A premium, highly interactive personal greeting page featuring backdrop glassmor
 
 ## 🔗 Live Demo
 
-You can run and preview the live page directly on your local system:
-👉 **[Launch Live Demo](file:///D:/wi/index.html)**
+You can preview the live page here:
+👉 **[Launch Live Demo](https://winnieshih1107.github.io/wi/)**
+
+Or open it locally:
+👉 [Local Preview](file:///D:/wi/index.html)
 
 ## ✨ Features
 
