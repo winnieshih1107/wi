@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A beautiful personal showcase page for Winnie showing a live clock, dynamic greeting, and date.">
+    <title>Hello from Winnie | Live Clock & Greeting</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* CSS Variables */
+        :root {
+            --bg-primary: #0a0b10;
+            --card-bg: rgba(20, 21, 33, 0.45);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --accent-1: #c084fc;
+            --accent-2: #6366f1;
+            --accent-3: #38bdf8;
+            --glow-color: rgba(99, 102, 241, 0.15);
+            --font-main: 'Outfit', sans-serif;
+            --font-mono: 'Space Grotesk', sans-serif;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #f8fafc;
+            --card-bg: rgba(255, 255, 255, 0.7);
+            --card-border: rgba(0, 0, 0, 0.06);
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --accent-1: #a855f7;
+            --accent-2: #4f46e5;
+            --accent-3: #0284c7;
+            --glow-color: rgba(79, 70, 229, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+            transition: background-color 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Animated Ambient Background Blobs */
+        .ambient-glow {
+            position: absolute;
+            width: 50vw;
+            height: 50vw;
+            border-radius: 50%;
+            filter: blur(120px);
+            z-index: -1;
+            opacity: 0.5;
+            animation: float 25s ease-in-out infinite alternate;
+            pointer-events: none;
+        }
+
+        .glow-1 {
+            background: radial-gradient(circle, var(--accent-1) 0%, transparent 70%);
+            top: -10%;
+            left: -10%;
+        }
+
+        .glow-2 {
+            background: radial-gradient(circle, var(--accent-3) 0%, transparent 70%);
+            bottom: -10%;
+            right: -10%;
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translate(0, 0) scale(1);
+            }
+            100% {
+                transform: translate(8%, 12%) scale(1.15);
+            }
+        }
+
+        /* Glassmorphic Main Card */
+        main {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            border-radius: 28px;
+            padding: 3.5rem 3rem;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.12);
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            transform: translateY(30px);
+            opacity: 0;
+            animation: slideUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+            transition: background-color 0.8s ease, border-color 0.8s ease, box-shadow 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Avatar Container & Animation */
+        .avatar-container {
+            position: relative;
+            width: 110px;
+            height: 110px;
+            margin: 0 auto 2rem auto;
+            transform: translateZ(50px);
+        }
+
+        .avatar {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2), var(--accent-3));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: #ffffff;
+            box-shadow: 0 10px 30px var(--glow-color);
+            position: relative;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .avatar-glow {
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2), var(--accent-3));
+            z-index: -1;
+            filter: blur(15px);
+            opacity: 0.7;
+            animation: pulse 4s infinite alternate ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(0.92);
+                opacity: 0.5;
+            }
+            100% {
+                transform: scale(1.08);
+                opacity: 0.9;
+            }
+        }
+
+        /* Greeting Label & Name */
+        .greeting-label {
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.25em;
+            color: var(--accent-2);
+            margin-bottom: 0.6rem;
+            transform: translateZ(30px);
+            transition: color 0.5s ease;
+        }
+
+        .name-heading {
+            font-size: 2.6rem;
+            font-weight: 800;
+            margin-bottom: 0.75rem;
+            background: linear-gradient(135deg, #ffffff 40%, var(--accent-1) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.02em;
+            transform: translateZ(40px);
+        }
+
+        [data-theme="light"] .name-heading {
+            background: linear-gradient(135deg, #0f172a 40%, var(--accent-2) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .tagline {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            font-weight: 400;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+            transform: translateZ(20px);
+            transition: color 0.5s ease;
+        }
+
+        /* Divider */
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--card-border), transparent);
+            margin: 2rem 0;
+            transform: translateZ(10px);
+        }
+
+        /* Time & Date Display */
+        .clock-container {
+            margin-bottom: 1.5rem;
+            transform: translateZ(45px);
+        }
+
+        .time-display {
+            font-family: var(--font-mono);
+            font-size: 3.6rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            color: var(--text-primary);
+            line-height: 1.1;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: baseline;
+            transition: color 0.5s ease;
+        }
+
+        .ampm {
+            font-size: 1.3rem;
+            font-weight: 500;
+            margin-left: 0.6rem;
+            color: var(--accent-3);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: color 0.5s ease;
+        }
+
+        .date-display {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+            letter-spacing: -0.01em;
+            transform: translateZ(25px);
+            transition: color 0.5s ease;
+        }
+
+        /* Dynamic Hour-based Greeting Badge */
+        .dynamic-badge {
+            display: inline-block;
+            padding: 0.6rem 1.2rem;
+            background: var(--card-border);
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--accent-3);
+            margin-top: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            transform: translateZ(30px);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        [data-theme="light"] .dynamic-badge {
+            border: 1px solid rgba(0, 0, 0, 0.02);
+        }
+
+        .dynamic-badge:hover {
+            transform: translateZ(35px) scale(1.05);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        [data-theme="light"] .dynamic-badge:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        /* Theme Toggle Button */
+        .theme-toggle {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: var(--card-border);
+            border: 1px solid var(--card-border);
+            color: var(--text-primary);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateZ(40px);
+            z-index: 10;
+        }
+
+        .theme-toggle:hover {
+            background: var(--text-primary);
+            color: var(--bg-primary);
+            transform: translateZ(40px) scale(1.1) rotate(15deg);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .theme-toggle svg {
+            width: 22px;
+            height: 22px;
+            fill: currentColor;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 480px) {
+            main {
+                padding: 2.5rem 1.5rem;
+            }
+            .time-display {
+                font-size: 2.8rem;
+            }
+            .name-heading {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Ambient Glowing Background Elements -->
+    <div class="ambient-glow glow-1" aria-hidden="true"></div>
+    <div class="ambient-glow glow-2" aria-hidden="true"></div>
+
+    <!-- Main Card Container -->
+    <main id="greetingCard">
+        <!-- Theme Toggle Button -->
+        <button class="theme-toggle" id="themeBtn" aria-label="Toggle light or dark theme" title="Toggle theme">
+            <svg id="themeIcon" viewBox="0 0 24 24">
+                <!-- SVG path injected by JS -->
+            </svg>
+        </button>
+
+        <!-- Profile/Avatar Component -->
+        <div class="avatar-container">
+            <div class="avatar-glow"></div>
+            <div class="avatar" id="avatarLetter">W</div>
+        </div>
+
+        <!-- Greeting Texts -->
+        <p class="greeting-label" id="greetingLabel">Welcome</p>
+        <h1 class="name-heading">Hello, I'm Winnie</h1>
+        <p class="tagline">Welcome to my personal showcase space.</p>
+
+        <div class="divider"></div>
+
+        <!-- Dynamic Time & Date Widget -->
+        <section class="clock-container" aria-label="Current Time and Date">
+            <div class="time-display" id="clock">
+                <span id="timeString">12:00:00</span>
+                <span id="ampmString" class="ampm">PM</span>
+            </div>
+            <div class="date-display" id="dateString">
+                Loading current date...
+            </div>
+        </section>
+
+        <!-- Dynamic Status Greeting -->
+        <div class="dynamic-badge" id="timeGreeting">
+            Have a wonderful day!
+        </div>
+    </main>
+
+    <script>
+        // Update Time & Date Functionality
+        function updateClock() {
+            const now = new Date();
+            
+            // Format time options
+            let hours = now.getHours();
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            
+            // Convert to 12-hour format
+            hours = hours % 12;
+            hours = hours ? hours : 12; // '0' becomes '12'
+            const hoursStr = String(hours).padStart(2, '0');
+            
+            // Update time text
+            document.getElementById('timeString').textContent = `${hoursStr}:${minutes}:${seconds}`;
+            document.getElementById('ampmString').textContent = ampm;
+
+            // Format date: e.g. "Friday, May 29, 2026"
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const dateText = now.toLocaleDateString('en-US', options);
+            document.getElementById('dateString').textContent = dateText;
+
+            // Compute dynamic greetings depending on current hour
+            const currentHour = now.getHours();
+            let greetMsg = "Have a wonderful day!";
+            let labelMsg = "Welcome";
+
+            if (currentHour >= 5 && currentHour < 12) {
+                greetMsg = "🌅 Good morning! Wishing you a productive day.";
+                labelMsg = "Good Morning";
+            } else if (currentHour >= 12 && currentHour < 17) {
+                greetMsg = "☀️ Good afternoon! Hope your day is going well.";
+                labelMsg = "Good Afternoon";
+            } else if (currentHour >= 17 && currentHour < 21) {
+                greetMsg = "🌇 Good evening! Time to wind down.";
+                labelMsg = "Good Evening";
+            } else {
+                greetMsg = "✨ Good night! Time for a peaceful rest.";
+                labelMsg = "Good Night";
+            }
+
+            document.getElementById('timeGreeting').textContent = greetMsg;
+            document.getElementById('greetingLabel').textContent = labelMsg;
+        }
+
+        // Initialize clock & refresh every second
+        updateClock();
+        setInterval(updateClock, 1000);
+
+        // Dark / Light Theme Toggle Control
+        const themeBtn = document.getElementById('themeBtn');
+        const themeIcon = document.getElementById('themeIcon');
+        
+        // Default to dark mode or system setting if preferred
+        let currentTheme = localStorage.getItem('theme');
+        if (!currentTheme) {
+            currentTheme = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+        }
+
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        updateIcon(currentTheme);
+
+        themeBtn.addEventListener('click', () => {
+            currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            localStorage.setItem('theme', currentTheme);
+            updateIcon(currentTheme);
+        });
+
+        function updateIcon(theme) {
+            if (theme === 'light') {
+                // Moon Icon for switching to dark mode
+                themeIcon.innerHTML = `<path d="M12 3c.132 0 .263 0 .393.007a7.5 7.5 0 0 0 7.92 12.446A9 9 0 1 1 12 2.992V3z"/>`;
+            } else {
+                // Sun Icon for switching to light mode
+                themeIcon.innerHTML = `<path d="M12 18a6 6 0 1 1 0-12 6 6 0 0 1 0 12zm0-2a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM11 1h2v3h-2V1zm0 19h2v3h-2v-3zM3.515 4.929l1.414-1.414L7.05 5.636 5.636 7.05 3.515 4.93zM16.95 18.364l1.414-1.414 2.121 2.121-1.414 1.414-2.121-2.121zm2.121-14.85l1.414 1.414-2.121 2.121-1.414-1.414 2.121-2.121zM5.636 16.95l1.414 1.414-2.121 2.121-1.414-1.414 2.121-2.121zM23 11v2h-3v-2h3zM4 11v2H1v-2h3z"/>`;
+            }
+        }
+
+        // Smooth Card Tilt Hover Effect
+        const card = document.getElementById('greetingCard');
+        
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left - (rect.width / 2);
+            const y = e.clientY - rect.top - (rect.height / 2);
+            
+            // Maximum tilt angle of 10 degrees
+            const rotateX = -(y / (rect.height / 2)) * 10;
+            const rotateY = (x / (rect.width / 2)) * 10;
+            
+            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        });
+
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg)';
+            card.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
+        });
+
+        card.addEventListener('mouseenter', () => {
+            card.style.transition = 'none';
+        });
+    </script>
+</body>
+</html>
