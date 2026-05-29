@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Winnie Consulting | 策略顧問</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── Tokens ─────────────────────────────────────────────── */
+    :root {
+      --bg:        #FAFAF8;
+      --bg-alt:    #F4EFE8;
+      --border:    #E8E0D4;
+      --text:      #2C2724;
+      --muted:     #7A706A;
+      --gold:      #B8975A;
+      --gold-lt:   #D4B87A;
+      --white:     #FFFFFF;
+      --serif:     'Cormorant Garamond', Georgia, serif;
+      --sans:      'Inter', system-ui, sans-serif;
+      --radius:    4px;
+      --transition: 0.3s ease;
+    }
+
+    /* ─── Reset ──────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--sans); background: var(--bg); color: var(--text); line-height: 1.6; }
+    img  { display: block; max-width: 100%; }
+    a    { color: inherit; text-decoration: none; }
+    ul   { list-style: none; }
+
+    /* ─── Nav ────────────────────────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(250, 250, 248, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 5%;
+      height: 72px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo {
+      font-family: var(--serif);
+      font-size: 1.5rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      color: var(--text);
+    }
+    .nav-logo span { color: var(--gold); }
+    .nav-links { display: flex; gap: 2.5rem; align-items: center; }
+    .nav-links a {
+      font-size: 0.875rem;
+      font-weight: 400;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--muted);
+      transition: color var(--transition);
+    }
+    .nav-links a:hover { color: var(--text); }
+    .btn-nav {
+      padding: 0.55rem 1.5rem;
+      border: 1px solid var(--text);
+      border-radius: var(--radius);
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: all var(--transition);
+    }
+    .btn-nav:hover { background: var(--text); color: var(--white); }
+    .nav-toggle { display: none; cursor: pointer; flex-direction: column; gap: 5px; }
+    .nav-toggle span { display: block; width: 24px; height: 1.5px; background: var(--text); transition: var(--transition); }
+
+    /* ─── Shared Utilities ───────────────────────────────────── */
+    section { padding: 7rem 5%; }
+    .section-label {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.25rem;
+    }
+    .section-heading {
+      font-family: var(--serif);
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 300;
+      line-height: 1.25;
+      color: var(--text);
+    }
+    .section-heading em { font-style: italic; color: var(--gold); }
+    .section-sub {
+      font-size: 1rem;
+      color: var(--muted);
+      max-width: 520px;
+      line-height: 1.75;
+      margin-top: 1rem;
+    }
+    .btn-primary {
+      display: inline-block;
+      padding: 0.9rem 2.2rem;
+      background: var(--text);
+      color: var(--white);
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border-radius: var(--radius);
+      transition: background var(--transition), transform var(--transition);
+    }
+    .btn-primary:hover { background: #1a1210; transform: translateY(-2px); }
+    .btn-outline {
+      display: inline-block;
+      padding: 0.9rem 2.2rem;
+      border: 1px solid var(--text);
+      color: var(--text);
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border-radius: var(--radius);
+      transition: all var(--transition);
+    }
+    .btn-outline:hover { background: var(--text); color: var(--white); }
+    .divider-gold {
+      width: 48px; height: 1px;
+      background: var(--gold);
+      margin: 1.5rem 0;
+    }
+
+    /* ─── Hero ───────────────────────────────────────────────── */
+    #hero {
+      min-height: 100vh;
+      padding-top: calc(72px + 5rem);
+      padding-bottom: 5rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+    .hero-eyebrow {
+      display: flex; align-items: center; gap: 1rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.5rem;
+    }
+    .hero-eyebrow::before {
+      content: '';
+      display: block;
+      width: 36px; height: 1px;
+      background: var(--gold);
+    }
+    .hero-heading {
+      font-family: var(--serif);
+      font-size: clamp(2.8rem, 5vw, 4.5rem);
+      font-weight: 300;
+      line-height: 1.15;
+      margin-bottom: 1.5rem;
+    }
+    .hero-heading em { font-style: italic; color: var(--gold); }
+    .hero-text {
+      font-size: 1.05rem;
+      color: var(--muted);
+      line-height: 1.8;
+      max-width: 460px;
+      margin-bottom: 2.5rem;
+    }
+    .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .hero-image {
+      position: relative;
+      height: 560px;
+    }
+    .hero-img-main {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      border-radius: 2px;
+      background: var(--bg-alt);
+    }
+    .hero-img-placeholder {
+      width: 100%; height: 100%;
+      background: linear-gradient(145deg, #E8DDD0 0%, #D4C8B8 50%, #C8B89A 100%);
+      border-radius: 2px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--serif);
+      font-size: 1.1rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+    }
+    .hero-badge {
+      position: absolute;
+      bottom: -1.5rem;
+      left: -1.5rem;
+      background: var(--white);
+      border: 1px solid var(--border);
+      padding: 1.25rem 1.5rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+      min-width: 180px;
+    }
+    .hero-badge-num {
+      font-family: var(--serif);
+      font-size: 2.5rem;
+      font-weight: 600;
+      color: var(--gold);
+      line-height: 1;
+    }
+    .hero-badge-text {
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 0.25rem;
+    }
+
+    /* ─── Marquee ────────────────────────────────────────────── */
+    .marquee-wrap {
+      background: var(--text);
+      padding: 1.25rem 0;
+      overflow: hidden;
+    }
+    .marquee-track {
+      display: flex;
+      gap: 3rem;
+      white-space: nowrap;
+      animation: scroll-left 30s linear infinite;
+    }
+    @keyframes scroll-left {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+    .marquee-item {
+      display: flex; align-items: center; gap: 3rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.6);
+    }
+    .marquee-dot { color: var(--gold); }
+
+    /* ─── Services ───────────────────────────────────────────── */
+    #services { background: var(--bg-alt); }
+    .services-header {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: end;
+      margin-bottom: 4rem;
+    }
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+    }
+    .service-card {
+      background: var(--bg-alt);
+      padding: 2.5rem;
+      transition: background var(--transition);
+    }
+    .service-card:hover { background: var(--white); }
+    .service-icon {
+      width: 44px; height: 44px;
+      margin-bottom: 1.5rem;
+      opacity: 0.7;
+    }
+    .service-title {
+      font-family: var(--serif);
+      font-size: 1.4rem;
+      font-weight: 400;
+      margin-bottom: 0.75rem;
+    }
+    .service-text {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+    }
+    .service-link {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      display: flex; align-items: center; gap: 0.5rem;
+      transition: gap var(--transition);
+    }
+    .service-card:hover .service-link { gap: 0.75rem; }
+
+    /* ─── About ──────────────────────────────────────────────── */
+    #about {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6rem;
+      align-items: center;
+    }
+    .about-image {
+      position: relative;
+      height: 520px;
+    }
+    .about-img-placeholder {
+      width: 100%; height: 100%;
+      background: linear-gradient(145deg, #D4C8B8, #C0AD97);
+      border-radius: 2px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--serif);
+      font-size: 1rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+    }
+    .about-frame {
+      position: absolute;
+      top: 2rem; left: 2rem; right: -2rem; bottom: -2rem;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      z-index: -1;
+    }
+    .about-content { padding-right: 2rem; }
+    .about-values {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 2.5rem;
+    }
+    .value-item { border-top: 1px solid var(--border); padding-top: 1rem; }
+    .value-title {
+      font-family: var(--serif);
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+    }
+    .value-text { font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
+
+    /* ─── Stats ──────────────────────────────────────────────── */
+    #stats {
+      background: var(--text);
+      color: var(--white);
+      padding: 5rem 5%;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2rem;
+    }
+    .stat-item { text-align: center; }
+    .stat-num {
+      font-family: var(--serif);
+      font-size: 3.5rem;
+      font-weight: 300;
+      color: var(--gold-lt);
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+      margin-top: 0.5rem;
+    }
+
+    /* ─── Process ────────────────────────────────────────────── */
+    #process { background: var(--bg-alt); }
+    .process-steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2rem;
+      margin-top: 4rem;
+    }
+    .step {
+      position: relative;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+    .step::before {
+      content: attr(data-step);
+      font-family: var(--serif);
+      font-size: 3.5rem;
+      font-weight: 300;
+      color: var(--border);
+      line-height: 1;
+      display: block;
+      margin-bottom: 0.75rem;
+    }
+    .step-title {
+      font-family: var(--serif);
+      font-size: 1.2rem;
+      font-weight: 400;
+      margin-bottom: 0.75rem;
+    }
+    .step-text { font-size: 0.875rem; color: var(--muted); line-height: 1.7; }
+
+    /* ─── Testimonials ───────────────────────────────────────── */
+    #testimonials {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    #testimonials-wrap { padding: 7rem 5%; }
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      margin-top: 4rem;
+    }
+    .testimonial-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      padding: 2.5rem;
+    }
+    .quote-mark {
+      font-family: var(--serif);
+      font-size: 4rem;
+      font-weight: 300;
+      color: var(--gold);
+      line-height: 0.5;
+      margin-bottom: 1.5rem;
+    }
+    .testimonial-text {
+      font-family: var(--serif);
+      font-size: 1.05rem;
+      font-weight: 300;
+      font-style: italic;
+      line-height: 1.7;
+      color: var(--text);
+      margin-bottom: 1.5rem;
+    }
+    .testimonial-author { display: flex; align-items: center; gap: 1rem; }
+    .author-avatar {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: var(--bg-alt);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--serif);
+      font-weight: 600;
+      color: var(--gold);
+    }
+    .author-name { font-size: 0.875rem; font-weight: 600; }
+    .author-role { font-size: 0.75rem; color: var(--muted); margin-top: 0.15rem; }
+
+    /* ─── CTA Banner ─────────────────────────────────────────── */
+    #cta {
+      background: var(--bg-alt);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      text-align: center;
+      padding: 6rem 5%;
+    }
+    .cta-heading {
+      font-family: var(--serif);
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 300;
+      margin-bottom: 1.25rem;
+    }
+    .cta-heading em { font-style: italic; color: var(--gold); }
+    .cta-text { color: var(--muted); margin-bottom: 2.5rem; max-width: 480px; margin-left: auto; margin-right: auto; }
+    .cta-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+    /* ─── Footer ─────────────────────────────────────────────── */
+    footer {
+      background: var(--text);
+      color: rgba(255,255,255,0.55);
+      padding: 5rem 5% 2.5rem;
+    }
+    .footer-top {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 3rem;
+      padding-bottom: 3rem;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .footer-logo {
+      font-family: var(--serif);
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--white);
+      margin-bottom: 1rem;
+    }
+    .footer-logo span { color: var(--gold-lt); }
+    .footer-desc { font-size: 0.875rem; line-height: 1.7; max-width: 280px; }
+    .footer-col-title {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--white);
+      margin-bottom: 1.25rem;
+    }
+    .footer-col ul { display: flex; flex-direction: column; gap: 0.75rem; }
+    .footer-col a { font-size: 0.875rem; transition: color var(--transition); }
+    .footer-col a:hover { color: var(--white); }
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 2rem;
+      font-size: 0.8rem;
+    }
+
+    /* ─── Animations ─────────────────────────────────────────── */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ─── Mobile ─────────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      #hero, #about { grid-template-columns: 1fr; }
+      .hero-image { height: 380px; order: -1; }
+      .hero-badge { display: none; }
+      .services-header { grid-template-columns: 1fr; gap: 1.5rem; }
+      .services-grid { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .process-steps { grid-template-columns: 1fr 1fr; }
+      .testimonials-grid { grid-template-columns: 1fr; }
+      .footer-top { grid-template-columns: 1fr 1fr; }
+      .nav-links { display: none; }
+      .nav-toggle { display: flex; }
+      .about-content { padding-right: 0; }
+    }
+    @media (max-width: 600px) {
+      section { padding: 4.5rem 6%; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .process-steps { grid-template-columns: 1fr; }
+      .footer-top { grid-template-columns: 1fr; }
+      .footer-bottom { flex-direction: column; gap: 1rem; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ─── Navigation ──────────────────────────────────────── -->
+  <nav>
+    <a href="#" class="nav-logo">Winnie<span>.</span></a>
+    <ul class="nav-links">
+      <li><a href="#services">服務</a></li>
+      <li><a href="#about">關於</a></li>
+      <li><a href="#process">流程</a></li>
+      <li><a href="#testimonials-wrap">案例</a></li>
+      <li><a href="#cta" class="btn-nav">聯絡我們</a></li>
+    </ul>
+    <div class="nav-toggle" id="navToggle">
+      <span></span><span></span><span></span>
+    </div>
+  </nav>
+
+  <!-- ─── Hero ────────────────────────────────────────────── -->
+  <section id="hero">
+    <div class="hero-left fade-up">
+      <div class="hero-eyebrow">策略顧問</div>
+      <h1 class="hero-heading">
+        引領企業<br>走向<em>嶄新高度</em>
+      </h1>
+      <p class="hero-text">
+        我們以深度洞察與精準策略，協助企業突破瓶頸、實現永續成長。每一個決策，都建立在數據與人文理解的交匯之上。
+      </p>
+      <div class="hero-actions">
+        <a href="#cta" class="btn-primary">預約諮詢</a>
+        <a href="#services" class="btn-outline">了解服務</a>
+      </div>
+    </div>
+    <div class="hero-image fade-up" style="transition-delay:0.15s">
+      <div class="hero-img-placeholder">STRATEGY · CLARITY</div>
+      <div class="hero-badge">
+        <div class="hero-badge-num">15+</div>
+        <div class="hero-badge-text">年產業經驗</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Marquee ──────────────────────────────────────────── -->
+  <div class="marquee-wrap">
+    <div class="marquee-track" aria-hidden="true">
+      <!-- Duplicate items for seamless loop -->
+      <div class="marquee-item">策略規劃 <span class="marquee-dot">✦</span></div>
+      <div class="marquee-item">品牌顧問 <span class="marquee-dot">✦</span></div>
+      <div class="marquee-item">數位轉型 <span class="marquee-dot">✦</span></div>
+      <div class="marquee-item">市場進入 <span class="marquee-dot">✦</span></div>
+      <div class="marquee-item">組織設計 <span class="marquee-dot">✦</span></div>
+      <div class="marquee-item">財務規劃 <span class="marquee-dot">✦</span></div>
+      <div class="marquee-item">策略規劃 <span class="marquee-dot">✦</span></div>
+      <div class="marquee-item">品牌顧問 <span class="marquee-dot">✦</span></div>
+      <div class="marquee-item">數位轉型 <span class="marquee-dot">✦</span></div>
+      <div class="marquee-item">市場進入 <span class="marquee-dot">✦</span></div>
+      <div class="marquee-item">組織設計 <span class="marquee-dot">✦</span></div>
+      <div class="marquee-item">財務規劃 <span class="marquee-dot">✦</span></div>
+    </div>
+  </div>
+
+  <!-- ─── Services ────────────────────────────────────────── -->
+  <section id="services">
+    <div class="services-header">
+      <div class="fade-up">
+        <span class="section-label">我們的服務</span>
+        <h2 class="section-heading">為您量身打造的<br><em>顧問解決方案</em></h2>
+      </div>
+      <div class="fade-up" style="transition-delay:0.1s">
+        <p class="section-sub">從策略到執行，我們提供全方位的顧問服務，陪伴企業在每個關鍵時刻做出正確決策。</p>
+        <div class="divider-gold"></div>
+      </div>
+    </div>
+
+    <div class="services-grid">
+      <div class="service-card fade-up">
+        <svg class="service-icon" viewBox="0 0 44 44" fill="none">
+          <path d="M8 36L22 8l14 28" stroke="#B8975A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M12 28h20" stroke="#B8975A" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <h3 class="service-title">企業策略規劃</h3>
+        <p class="service-text">以全局視野分析競爭格局，制定清晰可執行的長期與短期戰略路徑，為企業創造可持續的競爭優勢。</p>
+        <span class="service-link">深入了解 →</span>
+      </div>
+      <div class="service-card fade-up" style="transition-delay:0.1s">
+        <svg class="service-icon" viewBox="0 0 44 44" fill="none">
+          <circle cx="22" cy="22" r="14" stroke="#B8975A" stroke-width="1.5"/>
+          <path d="M22 14v8l6 4" stroke="#B8975A" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <h3 class="service-title">數位轉型加速</h3>
+        <p class="service-text">協助企業在數位浪潮中找到最佳切入點，整合科技與營運，讓數位化成為真正的成長引擎。</p>
+        <span class="service-link">深入了解 →</span>
+      </div>
+      <div class="service-card fade-up" style="transition-delay:0.2s">
+        <svg class="service-icon" viewBox="0 0 44 44" fill="none">
+          <rect x="8" y="8" width="28" height="28" rx="2" stroke="#B8975A" stroke-width="1.5"/>
+          <path d="M8 18h28M18 18v18" stroke="#B8975A" stroke-width="1.5"/>
+        </svg>
+        <h3 class="service-title">品牌與市場定位</h3>
+        <p class="service-text">深入洞察目標受眾與市場脈動，重新定義品牌價值主張，建立具有情感連結的品牌識別體系。</p>
+        <span class="service-link">深入了解 →</span>
+      </div>
+      <div class="service-card fade-up" style="transition-delay:0.3s">
+        <svg class="service-icon" viewBox="0 0 44 44" fill="none">
+          <path d="M10 34l8-10 6 6 8-14 8 18" stroke="#B8975A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h3 class="service-title">財務健診與規劃</h3>
+        <p class="service-text">透過財務數據的精準解析，識別風險與機會，建立健全的資本結構與財務預測模型。</p>
+        <span class="service-link">深入了解 →</span>
+      </div>
+      <div class="service-card fade-up" style="transition-delay:0.4s">
+        <svg class="service-icon" viewBox="0 0 44 44" fill="none">
+          <circle cx="16" cy="16" r="6" stroke="#B8975A" stroke-width="1.5"/>
+          <circle cx="30" cy="28" r="6" stroke="#B8975A" stroke-width="1.5"/>
+          <path d="M20 20l6 4" stroke="#B8975A" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <h3 class="service-title">組織設計與人才</h3>
+        <p class="service-text">建立敏捷、高效的組織架構，設計合理的激勵制度，吸引並留住能驅動成長的核心人才。</p>
+        <span class="service-link">深入了解 →</span>
+      </div>
+      <div class="service-card fade-up" style="transition-delay:0.5s">
+        <svg class="service-icon" viewBox="0 0 44 44" fill="none">
+          <path d="M22 8C14.268 8 8 14.268 8 22s6.268 14 14 14 14-6.268 14-14" stroke="#B8975A" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M28 8l8 8-8 8" stroke="#B8975A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h3 class="service-title">市場進入策略</h3>
+        <p class="service-text">無論是開拓新市場或跨境擴張，我們提供完整的市場評估、進入路徑與落地執行支持。</p>
+        <span class="service-link">深入了解 →</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── About ────────────────────────────────────────────── -->
+  <section id="about">
+    <div class="about-image fade-up">
+      <div class="about-img-placeholder">VISION · PURPOSE</div>
+      <div class="about-frame"></div>
+    </div>
+    <div class="about-content fade-up" style="transition-delay:0.15s">
+      <span class="section-label">關於我們</span>
+      <h2 class="section-heading">我們相信<br><em>策略的力量</em></h2>
+      <div class="divider-gold"></div>
+      <p class="section-sub">
+        Winnie Consulting 由一群對商業策略充滿熱情的顧問組成。我們深信，每一間企業都擁有尚未發掘的潛力，而我們的使命就是幫助您找到並釋放這份潛力。
+      </p>
+      <div class="about-values">
+        <div class="value-item">
+          <div class="value-title">誠信透明</div>
+          <div class="value-text">以坦誠的溝通建立長期信任，讓每個建議都有充分的事實依據。</div>
+        </div>
+        <div class="value-item">
+          <div class="value-title">結果導向</div>
+          <div class="value-text">從不停留在分析層面，我們追求可量化、可感知的實際成果。</div>
+        </div>
+        <div class="value-item">
+          <div class="value-title">深度洞察</div>
+          <div class="value-text">結合數據科學與人文視角，發現他人看不見的策略機會。</div>
+        </div>
+        <div class="value-item">
+          <div class="value-title">共創夥伴</div>
+          <div class="value-text">我們不是外部顧問，而是您的策略夥伴，共同承擔風險與榮耀。</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Stats ─────────────────────────────────────────────── -->
+  <section id="stats">
+    <div class="stats-grid">
+      <div class="stat-item fade-up">
+        <div class="stat-num">250+</div>
+        <div class="stat-label">服務企業數</div>
+      </div>
+      <div class="stat-item fade-up" style="transition-delay:0.1s">
+        <div class="stat-num">15</div>
+        <div class="stat-label">年產業經驗</div>
+      </div>
+      <div class="stat-item fade-up" style="transition-delay:0.2s">
+        <div class="stat-num">94%</div>
+        <div class="stat-label">客戶滿意度</div>
+      </div>
+      <div class="stat-item fade-up" style="transition-delay:0.3s">
+        <div class="stat-num">12</div>
+        <div class="stat-label">產業垂直領域</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Process ───────────────────────────────────────────── -->
+  <section id="process">
+    <div class="fade-up" style="max-width:600px">
+      <span class="section-label">合作流程</span>
+      <h2 class="section-heading">從診斷到落地的<br><em>四步驟框架</em></h2>
+    </div>
+    <div class="process-steps">
+      <div class="step fade-up" data-step="01">
+        <h3 class="step-title">深度探索</h3>
+        <p class="step-text">透過訪談、數據分析與市場研究，全面了解您的業務現況、挑戰與機會所在。</p>
+      </div>
+      <div class="step fade-up" data-step="02" style="transition-delay:0.1s">
+        <h3 class="step-title">策略制定</h3>
+        <p class="step-text">基於洞察結果，與您共同設計清晰的策略藍圖，確立優先目標與資源配置方向。</p>
+      </div>
+      <div class="step fade-up" data-step="03" style="transition-delay:0.2s">
+        <h3 class="step-title">方案執行</h3>
+        <p class="step-text">提供具體的行動方案與工具支援，協助您的團隊高效落地每一個策略舉措。</p>
+      </div>
+      <div class="step fade-up" data-step="04" style="transition-delay:0.3s">
+        <h3 class="step-title">追蹤優化</h3>
+        <p class="step-text">建立量化指標體系，持續監測成效並動態調整，確保策略長期有效運作。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Testimonials ──────────────────────────────────────── -->
+  <div id="testimonials-wrap">
+    <section id="testimonials">
+      <div class="fade-up" style="text-align:center; max-width:560px; margin:0 auto 4rem">
+        <span class="section-label">客戶評價</span>
+        <h2 class="section-heading">他們這樣<em>說我們</em></h2>
+      </div>
+      <div class="testimonials-grid">
+        <div class="testimonial-card fade-up">
+          <div class="quote-mark">"</div>
+          <p class="testimonial-text">Winnie 團隊幫助我們重新定義了市場定位。在他們的協助下，我們的品牌認知度在六個月內提升了兩倍。</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">A</div>
+            <div>
+              <div class="author-name">Amanda Chen</div>
+              <div class="author-role">CEO · 某科技新創公司</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card fade-up" style="transition-delay:0.1s">
+          <div class="quote-mark">"</div>
+          <p class="testimonial-text">他們提供的不只是建議，而是真正陪我們一起找出問題根源，並給出可執行的解決路徑。</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">J</div>
+            <div>
+              <div class="author-name">James Lin</div>
+              <div class="author-role">VP Strategy · 製造業集團</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card fade-up" style="transition-delay:0.2s">
+          <div class="quote-mark">"</div>
+          <p class="testimonial-text">數位轉型讓我們又擔心又害怕，但有 Winnie 顧問在旁，整個過程比預期順利太多，成效也遠超預期。</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">S</div>
+            <div>
+              <div class="author-name">Sophie Wang</div>
+              <div class="author-role">COO · 零售業品牌</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ─── CTA Banner ────────────────────────────────────────── -->
+  <section id="cta">
+    <div class="fade-up">
+      <span class="section-label">開始合作</span>
+      <h2 class="cta-heading">準備好迎接<em>下一個</em>突破了嗎？</h2>
+      <p class="cta-text">與我們預約一次免費的初步諮詢，了解我們如何協助您的企業創造更大的影響力。</p>
+      <div class="cta-actions">
+        <a href="mailto:winnieshih1107@gmail.com" class="btn-primary">預約免費諮詢</a>
+        <a href="#services" class="btn-outline">瀏覽服務項目</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Footer ────────────────────────────────────────────── -->
+  <footer>
+    <div class="footer-top">
+      <div>
+        <div class="footer-logo">Winnie<span>.</span></div>
+        <p class="footer-desc">引領企業以策略思維突破成長瓶頸，打造可持續的競爭優勢。</p>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">服務項目</div>
+        <ul>
+          <li><a href="#">企業策略規劃</a></li>
+          <li><a href="#">數位轉型加速</a></li>
+          <li><a href="#">品牌市場定位</a></li>
+          <li><a href="#">財務健診規劃</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">公司資訊</div>
+        <ul>
+          <li><a href="#about">關於我們</a></li>
+          <li><a href="#process">合作流程</a></li>
+          <li><a href="#testimonials-wrap">客戶案例</a></li>
+          <li><a href="#">Blog</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">聯絡方式</div>
+        <ul>
+          <li><a href="mailto:winnieshih1107@gmail.com">winnieshih1107@gmail.com</a></li>
+          <li><a href="#">LinkedIn</a></li>
+          <li><a href="#">Instagram</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Winnie Consulting. All rights reserved.</span>
+      <span>台灣・全球服務</span>
+    </div>
+  </footer>
+
+  <script>
+    // Scroll-triggered fade-up animation
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+    // Mobile nav toggle
+    document.getElementById('navToggle').addEventListener('click', () => {
+      const links = document.querySelector('.nav-links');
+      const isOpen = links.style.display === 'flex';
+      links.style.cssText = isOpen
+        ? ''
+        : 'display:flex;flex-direction:column;position:absolute;top:72px;left:0;right:0;background:rgba(250,250,248,0.97);padding:2rem 5%;border-bottom:1px solid #E8E0D4;gap:1.5rem;backdrop-filter:blur(12px)';
+    });
+  </script>
+</body>
+</html>
