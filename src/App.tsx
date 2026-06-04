@@ -37,7 +37,7 @@ const apiKey = window.__GEMINI_API_KEY__ || '';
 export default function App() {
   // 核心狀態管理
   const [activeTab, setActiveTab] = useState('generator'); // 'generator', 'architecture', 'code'
-  const [engine, setEngine] = useState('cosmos3'); // 'cosmos3' (HF), 'gemini' (Imagen 4.0)
+  const [engine, setEngine] = useState('pollinations'); // 'pollinations' (free), 'cosmos3' (HF), 'gemini' (Imagen 4.0)
   const [hfToken, setHfToken] = useState(() => {
     // Pre-fill from Streamlit-injected token or localStorage
     return window.__HF_TOKEN__ || localStorage.getItem('cosmos_hf_token') || '';
@@ -190,13 +190,50 @@ Cosmos 3 是一個物理真實性極高、世界模擬能力極強的模型，�
     setLoadingStep('正在初始化生成引擎...');
 
     try {
-      if (engine === 'cosmos3') {
+      if (engine === 'pollinations') {
+        // Pollinations.ai FLUX — 完全免費，無需任何 API 金鑰
+        setLoadingStep('正在連結 Pollinations.ai FLUX 免費生成伺服器...');
+
+        let width = 1024, height = 1024;
+        if (aspectRatio === '16:9') { width = 1024; height = 576; }
+        else if (aspectRatio === '9:16') { width = 576; height = 1024; }
+
+        const genSeed = seed === -1 ? Math.floor(Math.random() * 999999) : Number(seed);
+        const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=${width}&height=${height}&seed=${genSeed}&model=flux&nologo=true`;
+
+        setLoadingStep('Pollinations FLUX 正在生成圖像 (約需 10-20 秒)...');
+        const response = await fetch(url);
+
+        if (!response.ok) {
+          throw new Error(`Pollinations API 錯誤 (${response.status})，請稍後再試。`);
+        }
+
+        setLoadingStep('正在接收圖像資料...');
+        const imageBlob = await response.blob();
+        const localImageUrl = URL.createObjectURL(imageBlob);
+
+        const newRecord = {
+          id: `gen-${Date.now()}`,
+          prompt: prompt,
+          engine: 'Pollinations FLUX (免費)',
+          aspectRatio: aspectRatio,
+          imageUrl: localImageUrl,
+          timestamp: new Date().toLocaleTimeString(),
+          steps: 'Auto',
+          cfg: 'Auto'
+        };
+
+        setHistoryList(prev => [newRecord, ...prev]);
+        setSelectedImage(newRecord);
+        triggerToast('🎨 圖像生成成功！');
+
+      } else if (engine === 'cosmos3') {
         if (!hfToken.trim()) {
-          throw new Error('請在右側「Hugging Face 金鑰設定」中填入您的 HF API Token，或切換至「Gemini 免費體驗引擎」！');
+          throw new Error('請在「Hugging Face 金鑰設定」中填入您的 HF API Token，或切換至「Pollinations 免費引擎」！');
         }
 
         setLoadingStep('正在連結 Hugging Face 推理伺服器...');
-        
+
         let width = 1024, height = 1024;
         if (aspectRatio === '16:9') { width = 1024; height = 576; }
         else if (aspectRatio === '9:16') { width = 576; height = 1024; }
@@ -214,11 +251,11 @@ Cosmos 3 是一個物理真實性極高、世界模擬能力極強的模型，�
         };
 
         setLoadingStep('NVIDIA Cosmos 3 正在進行物理世界矩陣運算 (約需 10-30 秒)...');
-        
+
         const response = await fetchWithRetry(
           "https://api-inference.huggingface.co/models/nvidia/Cosmos3-Super-Text2Image",
           {
-            headers: { 
+            headers: {
               "Authorization": `Bearer ${hfToken.trim()}`,
               "Content-Type": "application/json"
             },
@@ -252,8 +289,9 @@ Cosmos 3 是一個物理真實性極高、世界模擬能力極強的模型，�
         triggerToast('🎨 Cosmos 3 圖像生成成功！');
 
       } else {
+        // Gemini Imagen 4.0 (需要 API 金鑰)
         setLoadingStep('正在連結 Google Imagen 4.0 圖像生成伺服器...');
-        
+
         const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${apiKey}`;
         const imagenPayload = {
           instances: { prompt: prompt },
@@ -267,7 +305,7 @@ Cosmos 3 是一個物理真實性極高、世界模擬能力極強的模型，�
         });
 
         if (!response.ok) {
-          throw new Error(`Google Imagen API 回傳錯誤 (${response.status})。`);
+          throw new Error(`Google Imagen API 回傳錯誤 (${response.status})。請確認 GEMINI_API_KEY 是否已在 Streamlit Secrets 中設定。`);
         }
 
         setLoadingStep('正在轉換並解碼 Base64 圖像數據...');
@@ -442,6 +480,17 @@ Cosmos 3 是一個物理真實性極高、世界模擬能力極強的模型，�
                 {/* 引擎切換按鈕 */}
                 <div className="grid grid-cols-2 gap-2 p-1 bg-slate-950 rounded-xl border border-slate-800 mb-4">
                   <button
+                    onClick={() => setEngine('pollinations')}
+                    className={`py-2 px-3 rounded-lg text-xs font-medium transition-all flex flex-col items-center justify-center ${
+                      engine === 'pollinations'
+                        ? 'bg-emerald-600 text-white font-bold shadow-md'
+                        : 'text-slate-400 hover:text-slate-200'
+                    }`}
+                  >
+                    <span>Pollinations FLUX</span>
+                    <span className="text-[9px] opacity-80 mt-0.5">真正免費・無需任何金鑰</span>
+                  </button>
+                  <button
                     onClick={() => setEngine('cosmos3')}
                     className={`py-2 px-3 rounded-lg text-xs font-medium transition-all flex flex-col items-center justify-center ${
                       engine === 'cosmos3'
@@ -452,20 +501,9 @@ Cosmos 3 是一個物理真實性極高、世界模擬能力極強的模型，�
                     <span>Cosmos 3 Super (64B)</span>
                     <span className="text-[9px] opacity-80 mt-0.5">Hugging Face 雲端運算</span>
                   </button>
-                  <button
-                    onClick={() => setEngine('gemini')}
-                    className={`py-2 px-3 rounded-lg text-xs font-medium transition-all flex flex-col items-center justify-center ${
-                      engine === 'gemini'
-                        ? 'bg-emerald-600 text-white font-bold shadow-md'
-                        : 'text-slate-400 hover:text-slate-200'
-                    }`}
-                  >
-                    <span>Imagen 4.0</span>
-                    <span className="text-[9px] opacity-80 mt-0.5">Google 內建免 Token 體驗</span>
-                  </button>
                 </div>
 
-                {/* HF Token 輸入框 */}
+                {/* HF Token 輸入框 / 免費引擎說明 */}
                 {engine === 'cosmos3' ? (
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
@@ -505,9 +543,9 @@ Cosmos 3 是一個物理真實性極高、世界模擬能力極強的模型，�
                   <div className="bg-emerald-950/20 border border-emerald-900/30 rounded-xl p-3 text-xs text-emerald-300/90 flex items-start space-x-2">
                     <Info className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                     <div>
-                      <p className="font-semibold">Gemini 內建沙盒引擎運作中</p>
+                      <p className="font-semibold">Pollinations FLUX 免費引擎就緒</p>
                       <p className="text-[11px] text-emerald-400/80 mt-0.5">
-                        本應用已安全對接 Imagen 4.0 圖像生成接口，適合直接在 Canvas 中演示。完成作業部署前，請記得配置 Hugging Face Token 以體驗 Cosmos 3 的強大威力。
+                        無需 API 金鑰，直接輸入提示詞即可生成圖像。由 Pollinations.ai 提供免費 FLUX 模型服務。
                       </p>
                     </div>
                   </div>
@@ -674,7 +712,7 @@ Cosmos 3 是一個物理真實性極高、世界模擬能力極強的模型，�
                     <>
                       <Play className="w-4 h-4 fill-current" />
                       <span>
-                        開始生成 {engine === 'cosmos3' ? 'Cosmos 3 Super 影像' : 'Imagen 4.0 影像'}
+                        開始生成 {engine === 'cosmos3' ? 'Cosmos 3 Super 影像' : engine === 'pollinations' ? 'FLUX 免費影像' : 'Imagen 4.0 影像'}
                       </span>
                     </>
                   )}
