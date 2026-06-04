@@ -234,7 +234,7 @@ with left:
 
     engine = st.selectbox("生成引擎 (Engine Mode)", [
         "🆓 完全免費生成 (Pollinations FLUX)",
-        "✨ Google Imagen 4.0 (需要 Gemini API Key)",
+        "✨ Gemini 2.0 Flash 圖像生成 (免費 Gemini Key 可用)",
         "🚀 NVIDIA Cosmos 3 Super (需要 HF Token)",
         "⚡ FLUX.1 Schnell (需要 HF Token)",
         "🌌 Stable Diffusion XL (需要 HF Token)",
@@ -385,20 +385,33 @@ if gen_btn:
                     )
                     st.stop()
 
-            elif "Imagen" in engine:
-                # ── Google Imagen 4.0 ─────────────────────────────────────
+            elif "Gemini" in engine:
+                # ── Gemini 2.0 Flash Image Generation (免費 Key 可用) ─────
                 active_key = gemini_key
                 if not active_key:
-                    st.error("請在 Streamlit Secrets 中設定 GEMINI_API_KEY")
+                    st.error("請在 Streamlit Secrets 中設定 GEMINI_API_KEY\n\n"
+                             "免費申請：https://aistudio.google.com/apikey")
                     st.stop()
-                endpoint = (f"https://generativelanguage.googleapis.com/v1beta"
-                            f"/models/imagen-4.0-generate-001:predict?key={active_key}")
-                payload = {"instances": {"prompt": raw_prompt}, "parameters": {"sampleCount": 1}}
+                endpoint = (
+                    "https://generativelanguage.googleapis.com/v1beta/models"
+                    f"/gemini-2.0-flash-exp-image-generation:generateContent?key={active_key}"
+                )
+                payload = {
+                    "contents": [{"parts": [{"text": raw_prompt}]}],
+                    "generationConfig": {"responseModalities": ["TEXT", "IMAGE"]},
+                }
                 resp = requests.post(endpoint, json=payload, timeout=60)
                 resp.raise_for_status()
                 data = resp.json()
-                b64 = data["predictions"][0]["bytesBase64Encoded"]
-                image_bytes = base64.b64decode(b64)
+                # 找出回應中的 inline image
+                image_bytes = None
+                for part in data.get("candidates", [{}])[0].get("content", {}).get("parts", []):
+                    if "inlineData" in part:
+                        image_bytes = base64.b64decode(part["inlineData"]["data"])
+                        break
+                if not image_bytes:
+                    st.error(f"Gemini 未回傳圖像，完整回應：{data}")
+                    st.stop()
 
             else:
                 # ── Hugging Face Inference API ────────────────────────────
