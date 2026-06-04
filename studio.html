@@ -891,7 +891,7 @@
                     };
                     const dims = ratioMap[appState.selectedRatio] || { w: 1024, h: 1024 };
                     const genSeed = Math.floor(Math.random() * 999999);
-                    const pollUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=${dims.w}&height=${dims.h}&seed=${genSeed}&model=flux&nologo=true`;
+                    const pollUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=${dims.w}&height=${dims.h}&seed=${genSeed}&model=flux`;
 
                     const pollResp = await fetch(pollUrl);
                     if (!pollResp.ok) throw new Error(`Pollinations API 錯誤 (${pollResp.status})，請稍後再試。`);
