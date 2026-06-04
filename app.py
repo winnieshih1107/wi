@@ -386,31 +386,51 @@ if gen_btn:
                     st.stop()
 
             elif "Gemini" in engine:
-                # ── Gemini 2.0 Flash Image Generation (免費 Key 可用) ─────
+                # ── Gemini Image Generation（依序嘗試可用模型）──────────
                 active_key = gemini_key
                 if not active_key:
                     st.error("請在 Streamlit Secrets 中設定 GEMINI_API_KEY\n\n"
                              "免費申請：https://aistudio.google.com/apikey")
                     st.stop()
-                endpoint = (
-                    "https://generativelanguage.googleapis.com/v1beta/models"
-                    f"/gemini-2.0-flash-exp-image-generation:generateContent?key={active_key}"
-                )
-                payload = {
-                    "contents": [{"parts": [{"text": raw_prompt}]}],
-                    "generationConfig": {"responseModalities": ["TEXT", "IMAGE"]},
-                }
-                resp = requests.post(endpoint, json=payload, timeout=60)
-                resp.raise_for_status()
-                data = resp.json()
-                # 找出回應中的 inline image
+
+                # Google 不斷更新模型名稱，依序嘗試直到成功
+                GEMINI_IMG_MODELS = [
+                    "gemini-2.0-flash-preview-image-generation",
+                    "gemini-2.0-flash-exp-image-generation",
+                    "gemini-2.5-flash-preview-image-generation",
+                    "gemini-2.5-flash-exp-image-generation",
+                    "gemini-2.0-flash-exp",
+                ]
                 image_bytes = None
-                for part in data.get("candidates", [{}])[0].get("content", {}).get("parts", []):
-                    if "inlineData" in part:
-                        image_bytes = base64.b64decode(part["inlineData"]["data"])
+                last_err = ""
+                for model_name in GEMINI_IMG_MODELS:
+                    endpoint = (
+                        "https://generativelanguage.googleapis.com/v1beta/models"
+                        f"/{model_name}:generateContent?key={active_key}"
+                    )
+                    payload = {
+                        "contents": [{"parts": [{"text": raw_prompt}]}],
+                        "generationConfig": {"responseModalities": ["TEXT", "IMAGE"]},
+                    }
+                    resp = requests.post(endpoint, json=payload, timeout=60)
+                    if resp.status_code == 404:
+                        last_err = f"{model_name} → 404 not found"
+                        continue
+                    if not resp.ok:
+                        last_err = f"{model_name} → {resp.status_code}: {resp.text[:200]}"
+                        continue
+                    data = resp.json()
+                    for part in (data.get("candidates") or [{}])[0].get("content", {}).get("parts", []):
+                        if "inlineData" in part:
+                            image_bytes = base64.b64decode(part["inlineData"]["data"])
+                            break
+                    if image_bytes:
                         break
+                    last_err = f"{model_name} → 回應無圖像 inline data"
+
                 if not image_bytes:
-                    st.error(f"Gemini 未回傳圖像，完整回應：{data}")
+                    st.error(f"所有 Gemini 圖像模型均不可用：\n{last_err}\n\n"
+                             "請改用「完全免費生成 (Pollinations FLUX)」引擎。")
                     st.stop()
 
             else:
