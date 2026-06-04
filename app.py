@@ -340,48 +340,65 @@ if gen_btn:
             if is_free:
                 import random, time
 
-                # ── 方案 A：HF FLUX.1-schnell 免 Token ───────────────────
                 image_bytes = None
-                hf_url = "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell"
-                try:
-                    hf_resp = requests.post(
-                        hf_url,
-                        json={"inputs": raw_prompt},
-                        headers={"Content-Type": "application/json"},
-                        timeout=90,
-                    )
-                    if hf_resp.ok and hf_resp.headers.get("content-type","").startswith("image"):
-                        image_bytes = hf_resp.content
-                except Exception:
-                    pass
 
-                # ── 方案 B：Pollinations（重試 3 次，每次間隔 6 秒）──────
+                def _is_image(content: bytes) -> bool:
+                    """檢查 bytes 是否為有效圖像（PNG / JPEG）"""
+                    return (len(content) > 4000 and
+                            content[:4] in (b'\x89PNG', b'\xff\xd8\xff\xe0',
+                                            b'\xff\xd8\xff\xe1', b'\xff\xd8\xff\xdb'))
+
+                # ── 方案 A：HF Inference API（多個模型，不需 Token）─────
+                HF_FREE = [
+                    ("runwayml/stable-diffusion-v1-5",
+                     {"inputs": raw_prompt, "parameters": {"num_inference_steps": 20}}),
+                    ("stabilityai/stable-diffusion-2-1",
+                     {"inputs": raw_prompt, "parameters": {"num_inference_steps": 20}}),
+                    ("stabilityai/stable-diffusion-xl-base-1.0",
+                     {"inputs": raw_prompt}),
+                ]
+                for hf_model, hf_payload in HF_FREE:
+                    if image_bytes:
+                        break
+                    try:
+                        r = requests.post(
+                            f"https://api-inference.huggingface.co/models/{hf_model}",
+                            json=hf_payload,
+                            timeout=60,
+                        )
+                        if r.status_code == 503:        # 模型啟動中，等 10 秒再試一次
+                            time.sleep(10)
+                            r = requests.post(
+                                f"https://api-inference.huggingface.co/models/{hf_model}",
+                                json=hf_payload, timeout=90)
+                        if r.ok and _is_image(r.content):
+                            image_bytes = r.content
+                    except Exception:
+                        pass
+
+                # ── 方案 B：Pollinations（最多等 30 秒重試 2 次）────────
                 if not image_bytes:
                     seed = random.randint(0, 999999)
                     poll_url = (f"https://image.pollinations.ai/prompt/{quote(raw_prompt)}"
                                 f"?width={w}&height={h}&seed={seed}&model=flux")
-                    for attempt in range(3):
+                    for attempt in range(2):
                         try:
-                            poll_resp = requests.get(poll_url, timeout=60)
-                            if poll_resp.ok:
-                                image_bytes = poll_resp.content
+                            pr = requests.get(poll_url, timeout=90)
+                            if pr.ok and _is_image(pr.content):
+                                image_bytes = pr.content
                                 break
-                            if poll_resp.status_code == 402 and attempt < 2:
-                                time.sleep(6)
-                                continue
-                            poll_resp.raise_for_status()
-                        except requests.HTTPError:
-                            if attempt == 2:
-                                raise
-                            time.sleep(6)
+                            if pr.status_code == 402:
+                                time.sleep(15)   # IP queue-full，等較長時間
+                        except Exception:
+                            time.sleep(5)
 
                 if not image_bytes:
                     st.error(
-                        "免費伺服器目前忙碌（IP 排隊已滿）。建議：\n\n"
-                        "1. 稍等 10 秒後再點擊生成\n"
-                        "2. 或至 [aistudio.google.com](https://aistudio.google.com/apikey) "
-                        "取得免費 Gemini API Key，在 Streamlit Secrets 設定 `GEMINI_API_KEY`，"
-                        "改用 Imagen 4.0 引擎（更穩定）"
+                        "**免費引擎暫時全部忙碌**，請擇一處理：\n\n"
+                        "- ⏰ **等 15～30 秒**後再點「啟動生成」\n"
+                        "- 🔑 在左側「進階參數」輸入 **HF Token** 後選「FLUX.1 Schnell」引擎"
+                        "（[免費申請](https://huggingface.co/settings/tokens)）\n"
+                        "- ☀️ 明天再試 Gemini 引擎（每日配額已重置）"
                     )
                     st.stop()
 
