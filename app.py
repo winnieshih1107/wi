@@ -338,14 +338,52 @@ if gen_btn:
     with st.spinner("正在生成圖像，請稍候..."):
         try:
             if is_free:
-                # ── Pollinations FLUX (server-side, no CORS) ──────────────
-                import random
-                seed = random.randint(0, 999999)
-                url = (f"https://image.pollinations.ai/prompt/{quote(raw_prompt)}"
-                       f"?width={w}&height={h}&seed={seed}&model=flux")
-                resp = requests.get(url, timeout=60)
-                resp.raise_for_status()
-                image_bytes = resp.content
+                import random, time
+
+                # ── 方案 A：HF FLUX.1-schnell 免 Token ───────────────────
+                image_bytes = None
+                hf_url = "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell"
+                try:
+                    hf_resp = requests.post(
+                        hf_url,
+                        json={"inputs": raw_prompt},
+                        headers={"Content-Type": "application/json"},
+                        timeout=90,
+                    )
+                    if hf_resp.ok and hf_resp.headers.get("content-type","").startswith("image"):
+                        image_bytes = hf_resp.content
+                except Exception:
+                    pass
+
+                # ── 方案 B：Pollinations（重試 3 次，每次間隔 6 秒）──────
+                if not image_bytes:
+                    seed = random.randint(0, 999999)
+                    poll_url = (f"https://image.pollinations.ai/prompt/{quote(raw_prompt)}"
+                                f"?width={w}&height={h}&seed={seed}&model=flux")
+                    for attempt in range(3):
+                        try:
+                            poll_resp = requests.get(poll_url, timeout=60)
+                            if poll_resp.ok:
+                                image_bytes = poll_resp.content
+                                break
+                            if poll_resp.status_code == 402 and attempt < 2:
+                                time.sleep(6)
+                                continue
+                            poll_resp.raise_for_status()
+                        except requests.HTTPError:
+                            if attempt == 2:
+                                raise
+                            time.sleep(6)
+
+                if not image_bytes:
+                    st.error(
+                        "免費伺服器目前忙碌（IP 排隊已滿）。建議：\n\n"
+                        "1. 稍等 10 秒後再點擊生成\n"
+                        "2. 或至 [aistudio.google.com](https://aistudio.google.com/apikey) "
+                        "取得免費 Gemini API Key，在 Streamlit Secrets 設定 `GEMINI_API_KEY`，"
+                        "改用 Imagen 4.0 引擎（更穩定）"
+                    )
+                    st.stop()
 
             elif "Imagen" in engine:
                 # ── Google Imagen 4.0 ─────────────────────────────────────
