@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+
+# Local environment
+.env
+.env.local
+.env.*.local
+
+# Streamlit secrets — NEVER commit real keys
+.streamlit/secrets.toml
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor directories
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# TypeScript build info
+*.tsbuildinfo
+
+# NOTE: dist/ is intentionally NOT ignored.
+# The built React app (dist/) must be committed so Streamlit Cloud
+# can serve it without running npm build during deployment.
