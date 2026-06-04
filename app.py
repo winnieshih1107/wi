@@ -393,18 +393,31 @@ if gen_btn:
                              "免費申請：https://aistudio.google.com/apikey")
                     st.stop()
 
-                # Google 不斷更新模型名稱，依序嘗試直到成功
-                GEMINI_IMG_MODELS = [
+                # 步驟 1：查詢當前帳號可用的模型清單
+                list_r = requests.get(
+                    f"https://generativelanguage.googleapis.com/v1beta/models?key={active_key}",
+                    timeout=15,
+                )
+                discovered = []
+                if list_r.ok:
+                    for m in list_r.json().get("models", []):
+                        n = m.get("name", "").replace("models/", "")
+                        if "image" in n.lower() or "imagen" in n.lower():
+                            discovered.append(n)
+
+                # 步驟 2：將已知候選放在後面當備援
+                FALLBACKS = [
                     "gemini-2.0-flash-preview-image-generation",
                     "gemini-2.0-flash-exp-image-generation",
                     "gemini-2.5-flash-preview-image-generation",
                     "gemini-2.5-flash-exp-image-generation",
-                    "gemini-2.0-flash-exp",
                 ]
+                models_to_try = discovered + [m for m in FALLBACKS if m not in discovered]
+
                 image_bytes = None
-                last_err = ""
-                for model_name in GEMINI_IMG_MODELS:
-                    endpoint = (
+                tried_log = []
+                for model_name in models_to_try:
+                    ep = (
                         "https://generativelanguage.googleapis.com/v1beta/models"
                         f"/{model_name}:generateContent?key={active_key}"
                     )
@@ -412,25 +425,31 @@ if gen_btn:
                         "contents": [{"parts": [{"text": raw_prompt}]}],
                         "generationConfig": {"responseModalities": ["TEXT", "IMAGE"]},
                     }
-                    resp = requests.post(endpoint, json=payload, timeout=60)
-                    if resp.status_code == 404:
-                        last_err = f"{model_name} → 404 not found"
+                    r = requests.post(ep, json=payload, timeout=60)
+                    if r.status_code in (404, 400):
+                        tried_log.append(f"{model_name} → {r.status_code}")
                         continue
-                    if not resp.ok:
-                        last_err = f"{model_name} → {resp.status_code}: {resp.text[:200]}"
+                    if not r.ok:
+                        tried_log.append(f"{model_name} → {r.status_code}: {r.text[:120]}")
                         continue
-                    data = resp.json()
-                    for part in (data.get("candidates") or [{}])[0].get("content", {}).get("parts", []):
+                    for part in (r.json().get("candidates") or [{}])[0].get("content", {}).get("parts", []):
                         if "inlineData" in part:
                             image_bytes = base64.b64decode(part["inlineData"]["data"])
                             break
                     if image_bytes:
                         break
-                    last_err = f"{model_name} → 回應無圖像 inline data"
+                    tried_log.append(f"{model_name} → 回應無圖像")
 
                 if not image_bytes:
-                    st.error(f"所有 Gemini 圖像模型均不可用：\n{last_err}\n\n"
-                             "請改用「完全免費生成 (Pollinations FLUX)」引擎。")
+                    avail_str = "\n".join(discovered) if discovered else "（查無圖像模型）"
+                    tried_str = "\n".join(tried_log)
+                    st.error(
+                        "**Gemini 圖像生成目前不可用**\n\n"
+                        f"您帳號的圖像模型：\n```\n{avail_str}\n```\n"
+                        f"嘗試結果：\n```\n{tried_str}\n```\n\n"
+                        "**建議**：改用下拉選單的「🆓 完全免費生成 (Pollinations FLUX)」，"
+                        "或至 [Google AI Studio](https://aistudio.google.com) 確認帳號已開啟圖像生成功能。"
+                    )
                     st.stop()
 
             else:
