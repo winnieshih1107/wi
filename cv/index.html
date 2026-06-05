@@ -274,7 +274,9 @@
       padding: 2rem 6%; border-top: 1px solid var(--border);
       display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
     }
-    .footer-logo { font-family: var(--serif); font-size: 0.95rem; color: var(--muted); cursor: pointer; user-select: none; padding: 0.5rem 0.25rem; }
+    .footer-logo { font-family: var(--serif); font-size: 0.95rem; color: var(--muted); }
+    .footer-admin-link { font-size: 0.75rem; color: rgba(255,255,255,0.12); transition: color 0.2s; }
+    .footer-admin-link:hover { color: var(--gold); }
     .footer-copy { font-size: 0.7rem; color: rgba(255,255,255,0.2); letter-spacing: 0.05em; }
     .footer-links { display: flex; gap: 2rem; }
     .footer-links a { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.25); transition: color 0.2s; }
@@ -756,12 +758,13 @@
 
 <!-- FOOTER -->
 <footer>
-  <div class="footer-logo" id="footerLogo" title="點擊 5 次進入管理模式">Winnie Shih</div>
+  <div class="footer-logo" id="footerLogo">Winnie Shih</div>
   <p class="footer-copy">&copy; 2026 · Built with HTML, CSS & curiosity.</p>
   <ul class="footer-links">
     <li><a href="#works">Works</a></li>
     <li><a href="#about">About</a></li>
     <li><a href="#contact">Contact</a></li>
+    <li><a href="#" class="footer-admin-link" onclick="event.preventDefault();openPwdModal()">⚙</a></li>
   </ul>
 </footer>
 
@@ -821,22 +824,6 @@ document.querySelectorAll('.project-card').forEach((card, i) => {
 });
 
 // ── ADMIN — PASSWORD ────────────────────────────────────────────────────
-let _logoClicks = 0, _logoTimer = null;
-
-(function() {
-  const logo = document.getElementById('footerLogo');
-  logo.addEventListener('click', function(e) {
-    e.stopPropagation();
-    _logoClicks++;
-    clearTimeout(_logoTimer);
-    if (_logoClicks >= 5) {
-      _logoClicks = 0;
-      openPwdModal();
-      return;
-    }
-    _logoTimer = setTimeout(function() { _logoClicks = 0; }, 2500);
-  });
-})();
 
 function openPwdModal() {
   document.getElementById('pwdInput').value = '';
