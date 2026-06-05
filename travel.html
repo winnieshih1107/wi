@@ -473,7 +473,7 @@
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">地點名稱 *</label>
-          <input class="form-input" id="pin-name" placeholder="例：東京、巴黎、台北" />
+          <input class="form-input" id="pin-name" placeholder="例：Tokyo, Paris, Taipei" oninput="onPinNameInput(this.value)" autocomplete="off" />
         </div>
         <div class="form-group">
           <label class="form-label">Emoji 旗幟</label>
@@ -483,13 +483,14 @@
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">緯度（Lat）</label>
-          <input class="form-input" id="pin-lat" placeholder="35.6762" type="number" step="any" />
+          <input class="form-input" id="pin-lat" placeholder="自動帶入" type="number" step="any" />
         </div>
         <div class="form-group">
           <label class="form-label">經度（Lng）</label>
-          <input class="form-input" id="pin-lng" placeholder="139.6503" type="number" step="any" />
+          <input class="form-input" id="pin-lng" placeholder="自動帶入" type="number" step="any" />
         </div>
       </div>
+      <div id="geo-status" style="font-size:0.78rem;min-height:1.2em;color:#aaa;margin-top:-0.25rem"></div>
       <div class="form-group">
         <label class="form-label">造訪日期</label>
         <input class="form-input" id="pin-date" type="date" />
@@ -498,7 +499,7 @@
         <label class="form-label">備註</label>
         <textarea class="form-textarea" id="pin-note" placeholder="這趟旅行最難忘的是…"></textarea>
       </div>
-      <p style="font-size:0.75rem;color:#aaa">💡 也可以直接在地圖上點擊來快速插旗</p>
+      <p style="font-size:0.75rem;color:#aaa">💡 輸入地點名稱會自動帶入座標；也可直接點擊地圖插旗</p>
       <button class="btn-submit" onclick="savePin()">儲存地點</button>
     </div>
   </div>
@@ -613,8 +614,9 @@ const map = L.map('world-map', {
   zoomControl: true
 });
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '© OpenStreetMap contributors'
+L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+  attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/">CARTO</a>',
+  subdomains: 'abcd', maxZoom: 20
 }).addTo(map);
 
 const markerGroup = L.layerGroup().addTo(map);
@@ -662,6 +664,48 @@ map.on('click', function(e) {
   document.getElementById('pin-lng').value = e.latlng.lng.toFixed(4);
   openPinModal();
 });
+
+// ── GEOCODING ─────────────────────────────────────────────────────────
+let _geoTimer = null;
+
+function setGeoStatus(state, detail) {
+  const el = document.getElementById('geo-status');
+  if (!el) return;
+  const msgs = {
+    searching: '🔍 正在搜尋座標…',
+    found:     `✅ 已找到：${(detail||'').split(',').slice(0,2).join(',')}`,
+    notfound:  '⚠️ 找不到此地點，請手動輸入座標',
+    error:     '⚠️ 搜尋失敗，請手動輸入座標',
+    clear:     ''
+  };
+  el.textContent = msgs[state] || '';
+  el.style.color = state === 'found' ? '#2e9e8f' : state === 'searching' ? '#aaa' : '#c0834a';
+}
+
+function onPinNameInput(val) {
+  clearTimeout(_geoTimer);
+  setGeoStatus('clear');
+  if (!val || val.trim().length < 2) return;
+  setGeoStatus('searching');
+  _geoTimer = setTimeout(() => geocodeName(val.trim()), 650);
+}
+
+async function geocodeName(q) {
+  try {
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=1&accept-language=en`;
+    const res  = await fetch(url, { headers: { 'Accept-Language': 'en' } });
+    const data = await res.json();
+    if (data && data.length > 0) {
+      document.getElementById('pin-lat').value = parseFloat(data[0].lat).toFixed(4);
+      document.getElementById('pin-lng').value = parseFloat(data[0].lon).toFixed(4);
+      setGeoStatus('found', data[0].display_name);
+    } else {
+      setGeoStatus('notfound');
+    }
+  } catch(e) {
+    setGeoStatus('error');
+  }
+}
 
 function savePin() {
   const name  = document.getElementById('pin-name').value.trim();
@@ -832,7 +876,10 @@ function deleteJournal(i) {
 }
 
 // ── MODALS ────────────────────────────────────────────────────────────
-function openPinModal()     { document.getElementById('pin-modal').classList.add('open'); }
+function openPinModal() {
+  document.getElementById('pin-modal').classList.add('open');
+  setGeoStatus('clear');
+}
 function openPhotoModal()   { document.getElementById('photo-modal').classList.add('open'); }
 function openJournalModal() {
   document.getElementById('journal-modal').classList.add('open');
