@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Winnie Shih | Strategy & Digital</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: #fff; color: #111; overflow-x: hidden; }
+    a { text-decoration: none; color: inherit; }
+    ul { list-style: none; }
+    img { display: block; max-width: 100%; }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      background: #0d0d0d;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 5%;
+      height: 64px;
+    }
+    .nav-brand {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: #fff;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .nav-brand .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: linear-gradient(135deg, #ff6b35, #f7c948);
+    }
+    .nav-links { display: flex; gap: 2.5rem; align-items: center; }
+    .nav-links a {
+      font-size: 0.8rem; font-weight: 500;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: rgba(255,255,255,0.6);
+      transition: color 0.25s;
+    }
+    .nav-links a:hover { color: #fff; }
+    .nav-cta {
+      padding: 0.5rem 1.4rem;
+      background: #fff; color: #0d0d0d !important;
+      border-radius: 2px;
+      font-weight: 700 !important;
+      transition: background 0.25s, color 0.25s !important;
+    }
+    .nav-cta:hover { background: #f7c948 !important; color: #0d0d0d !important; }
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+    .hamburger span { display: block; width: 24px; height: 2px; background: #fff; transition: 0.3s; }
+
+    /* ── HERO ── */
+    .hero {
+      margin-top: 64px;
+      min-height: calc(100vh - 64px);
+      display: grid;
+      grid-template-columns: 1fr 260px 220px;
+    }
+    .hero-main {
+      background: linear-gradient(135deg, #ff9a5c 0%, #ff6b35 35%, #e8478c 70%, #c93da0 100%);
+      padding: 6rem 5% 4rem;
+      display: flex; flex-direction: column; justify-content: space-between;
+      position: relative; overflow: hidden;
+    }
+    .hero-main::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 30% 60%, rgba(255,255,255,0.08) 0%, transparent 60%);
+    }
+    .hero-eyebrow {
+      font-size: 0.75rem; font-weight: 600;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: rgba(255,255,255,0.75);
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 2.5rem;
+    }
+    .hero-eyebrow::before {
+      content: ''; width: 32px; height: 1px; background: rgba(255,255,255,0.6);
+    }
+    .hero-title {
+      font-size: clamp(3rem, 7vw, 5.5rem);
+      font-weight: 900;
+      line-height: 1.0;
+      color: #fff;
+      letter-spacing: -0.02em;
+      position: relative;
+    }
+    .hero-bottom {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      gap: 2rem; position: relative;
+    }
+    .hero-desc {
+      font-size: 0.95rem; line-height: 1.7;
+      color: rgba(255,255,255,0.8);
+      max-width: 380px;
+    }
+    .hero-btn {
+      display: inline-flex; align-items: center; gap: 12px;
+      padding: 1rem 2rem;
+      background: rgba(255,255,255,0.15);
+      border: 1.5px solid rgba(255,255,255,0.5);
+      border-radius: 2px;
+      color: #fff;
+      font-size: 0.8rem; font-weight: 600;
+      letter-spacing: 0.15em; text-transform: uppercase;
+      transition: background 0.25s, border-color 0.25s;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .hero-btn:hover { background: rgba(255,255,255,0.28); border-color: #fff; }
+    .hero-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+    .hero-col-yellow {
+      background: #f7c948;
+      display: flex; flex-direction: column; justify-content: flex-end;
+      padding: 2.5rem 2rem;
+    }
+    .hero-col-yellow .col-tagline {
+      font-size: 1.35rem; font-weight: 800;
+      line-height: 1.25; color: #0d0d0d;
+      margin-bottom: 1.5rem;
+    }
+    .hero-col-yellow .col-img {
+      width: 100%; aspect-ratio: 1/1.1;
+      background: #e5b500;
+      overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 4rem;
+    }
+    .hero-col-teal {
+      background: #00c9a0;
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 2.5rem 2rem;
+    }
+    .col-stat { margin-bottom: 2rem; }
+    .col-stat:last-child { margin-bottom: 0; }
+    .stat-num {
+      font-size: 3rem; font-weight: 900;
+      color: #0d0d0d; line-height: 1;
+    }
+    .stat-label {
+      font-size: 0.8rem; font-weight: 500;
+      color: rgba(0,0,0,0.6); margin-top: 4px;
+      text-transform: uppercase; letter-spacing: 0.1em;
+    }
+    .hero-scroll {
+      position: absolute; bottom: 2rem; right: 2rem;
+      font-size: 0.7rem; font-weight: 600; letter-spacing: 0.2em;
+      text-transform: uppercase; color: rgba(255,255,255,0.55);
+      writing-mode: vertical-rl;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .hero-scroll::after {
+      content: ''; width: 1px; height: 40px; background: rgba(255,255,255,0.4);
+    }
+
+    /* ── ABOUT ── */
+    #about { padding: 7rem 5%; }
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem; align-items: center;
+    }
+    .about-label {
+      font-size: 0.75rem; font-weight: 700;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: #e8478c; margin-bottom: 1.25rem;
+    }
+    .about-heading {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 900; line-height: 1.1;
+      letter-spacing: -0.02em; color: #0d0d0d;
+      margin-bottom: 1.5rem;
+    }
+    .about-heading em { font-style: italic; font-weight: 300; color: #e8478c; }
+    .about-text {
+      font-size: 1rem; line-height: 1.8;
+      color: #555; margin-bottom: 1.25rem;
+    }
+    .about-link {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 0.85rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: #0d0d0d; border-bottom: 2px solid #0d0d0d;
+      padding-bottom: 2px; transition: color 0.2s, border-color 0.2s;
+      margin-top: 0.75rem;
+    }
+    .about-link:hover { color: #e8478c; border-color: #e8478c; }
+    .about-visual {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 220px 220px;
+      gap: 12px;
+    }
+    .av-block {
+      border-radius: 2px; overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      text-align: center; padding: 1rem;
+    }
+    .av-1 { background: #ff6b35; color: #fff; grid-row: span 2; font-size: 1.1rem; }
+    .av-2 { background: #f7c948; color: #0d0d0d; }
+    .av-3 { background: #00c9a0; color: #0d0d0d; }
+
+    /* ── SERVICES ── */
+    #services { padding: 7rem 5%; background: #0d0d0d; }
+    .services-header {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      margin-bottom: 4rem; gap: 2rem;
+    }
+    .services-label {
+      font-size: 0.75rem; font-weight: 700;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: #f7c948; margin-bottom: 1rem;
+    }
+    .services-heading {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 900; line-height: 1.1;
+      letter-spacing: -0.02em; color: #fff;
+    }
+    .services-sub {
+      font-size: 0.95rem; color: rgba(255,255,255,0.5);
+      max-width: 340px; line-height: 1.7;
+      flex-shrink: 0;
+    }
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+    }
+    .service-card {
+      background: #1a1a1a;
+      padding: 2.5rem 2rem;
+      transition: background 0.25s;
+      position: relative; overflow: hidden;
+    }
+    .service-card::before {
+      content: '';
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 3px;
+      transform: scaleX(0); transform-origin: left;
+      transition: transform 0.3s;
+    }
+    .service-card:nth-child(1)::before { background: #ff6b35; }
+    .service-card:nth-child(2)::before { background: #f7c948; }
+    .service-card:nth-child(3)::before { background: #00c9a0; }
+    .service-card:nth-child(4)::before { background: #e8478c; }
+    .service-card:nth-child(5)::before { background: #6366f1; }
+    .service-card:nth-child(6)::before { background: #ff6b35; }
+    .service-card:hover { background: #222; }
+    .service-card:hover::before { transform: scaleX(1); }
+    .service-num {
+      font-size: 0.7rem; font-weight: 700;
+      letter-spacing: 0.15em; color: rgba(255,255,255,0.25);
+      margin-bottom: 1.5rem;
+    }
+    .service-icon {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 1.5rem; font-size: 1.3rem;
+    }
+    .si-1 { background: rgba(255,107,53,0.15); }
+    .si-2 { background: rgba(247,201,72,0.15); }
+    .si-3 { background: rgba(0,201,160,0.15); }
+    .si-4 { background: rgba(232,71,140,0.15); }
+    .si-5 { background: rgba(99,102,241,0.15); }
+    .si-6 { background: rgba(255,107,53,0.15); }
+    .service-title {
+      font-size: 1.1rem; font-weight: 800;
+      color: #fff; margin-bottom: 0.75rem; line-height: 1.3;
+    }
+    .service-desc {
+      font-size: 0.875rem; line-height: 1.7;
+      color: rgba(255,255,255,0.45);
+    }
+
+    /* ── NUMBERS BAND ── */
+    .numbers-band { background: #f7c948; display: flex; }
+    .number-item {
+      flex: 1; padding: 3.5rem 3rem;
+      border-right: 1px solid rgba(0,0,0,0.1);
+      display: flex; flex-direction: column; gap: 0.5rem;
+    }
+    .number-item:last-child { border-right: none; }
+    .number-val {
+      font-size: clamp(2.5rem, 5vw, 3.5rem);
+      font-weight: 900; line-height: 1;
+      color: #0d0d0d; letter-spacing: -0.03em;
+    }
+    .number-label {
+      font-size: 0.8rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      color: rgba(0,0,0,0.55);
+    }
+
+    /* ── WORK ── */
+    #work { padding: 7rem 5%; }
+    .work-label {
+      font-size: 0.75rem; font-weight: 700;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: #00c9a0; margin-bottom: 1rem;
+    }
+    .work-heading {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 900; line-height: 1.1;
+      letter-spacing: -0.02em; margin-bottom: 4rem;
+    }
+    .work-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 12px;
+    }
+    .work-item {
+      position: relative; overflow: hidden;
+      aspect-ratio: 16/9;
+      cursor: pointer;
+    }
+    .work-item:nth-child(1) { aspect-ratio: auto; grid-row: span 2; }
+    .work-item-bg {
+      width: 100%; height: 100%;
+      min-height: 200px;
+      transition: transform 0.5s;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 4rem;
+    }
+    .work-item:hover .work-item-bg { transform: scale(1.05); }
+    .wi-1 { background: linear-gradient(135deg, #ff6b35, #e8478c); }
+    .wi-2 { background: linear-gradient(135deg, #f7c948, #ff9a5c); }
+    .wi-3 { background: linear-gradient(135deg, #00c9a0, #6366f1); }
+    .work-overlay {
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex; flex-direction: column;
+      justify-content: flex-end; padding: 2rem;
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .work-item:hover .work-overlay { opacity: 1; }
+    .work-tag {
+      font-size: 0.7rem; font-weight: 700;
+      letter-spacing: 0.15em; text-transform: uppercase;
+      color: #f7c948; margin-bottom: 0.4rem;
+    }
+    .work-title {
+      font-size: 1.2rem; font-weight: 800;
+      color: #fff; line-height: 1.3;
+    }
+
+    /* ── CONTACT ── */
+    #contact {
+      padding: 7rem 5%;
+      background: linear-gradient(135deg, #ff9a5c 0%, #ff6b35 40%, #e8478c 100%);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem; align-items: center;
+    }
+    .contact-heading {
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 900; line-height: 1.0;
+      letter-spacing: -0.03em; color: #fff;
+      margin-bottom: 1.5rem;
+    }
+    .contact-sub {
+      font-size: 1rem; line-height: 1.7;
+      color: rgba(255,255,255,0.8); margin-bottom: 2.5rem;
+    }
+    .contact-btn {
+      display: inline-flex; align-items: center; gap: 12px;
+      padding: 1.1rem 2.5rem;
+      background: #0d0d0d; color: #fff;
+      font-size: 0.85rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      border-radius: 2px;
+      transition: background 0.25s, color 0.25s;
+    }
+    .contact-btn:hover { background: #f7c948; color: #0d0d0d; }
+    .contact-form { display: flex; flex-direction: column; gap: 1rem; }
+    .contact-form input,
+    .contact-form textarea {
+      width: 100%; padding: 1rem 1.25rem;
+      background: rgba(255,255,255,0.15);
+      border: 1.5px solid rgba(255,255,255,0.3);
+      border-radius: 2px;
+      color: #fff; font-size: 0.95rem;
+      font-family: inherit; outline: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .contact-form input::placeholder,
+    .contact-form textarea::placeholder { color: rgba(255,255,255,0.55); }
+    .contact-form input:focus,
+    .contact-form textarea:focus {
+      border-color: rgba(255,255,255,0.7);
+      background: rgba(255,255,255,0.22);
+    }
+    .contact-form textarea { height: 130px; resize: none; }
+    .contact-form button {
+      padding: 1rem 2rem;
+      background: #fff; color: #0d0d0d;
+      font-size: 0.85rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      border: none; border-radius: 2px;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .contact-form button:hover { background: #f7c948; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: #0d0d0d;
+      padding: 2.5rem 5%;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .footer-brand {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1rem; font-weight: 700;
+      color: #fff; letter-spacing: 0.08em;
+    }
+    .footer-copy { font-size: 0.75rem; color: rgba(255,255,255,0.35); }
+    .footer-links { display: flex; gap: 2rem; }
+    .footer-links a {
+      font-size: 0.75rem; font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: rgba(255,255,255,0.4); transition: color 0.2s;
+    }
+    .footer-links a:hover { color: #f7c948; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; }
+      .hero-col-yellow, .hero-col-teal { display: none; }
+      .about-grid { grid-template-columns: 1fr; }
+      .about-visual { display: none; }
+      .services-grid { grid-template-columns: 1fr 1fr; }
+      .services-header { flex-direction: column; align-items: flex-start; }
+      .work-grid { grid-template-columns: 1fr; }
+      .work-item:nth-child(1) { grid-row: auto; }
+      #contact { grid-template-columns: 1fr; }
+      .numbers-band { flex-wrap: wrap; }
+      .number-item { flex: 1 1 50%; border-right: none; border-bottom: 1px solid rgba(0,0,0,0.1); }
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      footer { flex-direction: column; text-align: center; }
+      .footer-links { flex-wrap: wrap; justify-content: center; }
+    }
+    @media (max-width: 600px) {
+      .services-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ── MOBILE MENU ── */
+    .mobile-menu {
+      display: none; position: fixed; inset: 0; z-index: 190;
+      background: #0d0d0d;
+      flex-direction: column; align-items: center; justify-content: center;
+      gap: 2.5rem; padding-top: 64px;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      font-size: 1.8rem; font-weight: 800;
+      letter-spacing: -0.02em; color: #fff; transition: color 0.2s;
+    }
+    .mobile-menu a:hover { color: #f7c948; }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-brand">
+      <div class="dot"></div>
+      WINNIE SHIH
+    </div>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#work">Work</a></li>
+      <li><a href="#contact" class="nav-cta">Contact</a></li>
+    </ul>
+    <div class="hamburger" id="hamburger" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
+    </div>
+  </nav>
+
+  <!-- MOBILE MENU -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#about" onclick="toggleMenu()">About</a>
+    <a href="#services" onclick="toggleMenu()">Services</a>
+    <a href="#work" onclick="toggleMenu()">Work</a>
+    <a href="#contact" onclick="toggleMenu()">Contact</a>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-main">
+      <div>
+        <p class="hero-eyebrow">Strategy & Digital</p>
+        <h1 class="hero-title">I Turn Ideas<br>Into Results</h1>
+      </div>
+      <div class="hero-bottom">
+        <p class="hero-desc">
+          Helping brands grow with strategic clarity, digital precision,
+          and creative execution — from consulting to go-to-market.
+        </p>
+        <a class="hero-btn" href="#contact">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+          LET'S TALK
+        </a>
+      </div>
+      <div class="hero-scroll">SCROLL</div>
+    </div>
+
+    <div class="hero-col-yellow">
+      <p class="col-tagline">We Help You<br>Stand Out</p>
+      <div class="col-img">✦</div>
+    </div>
+
+    <div class="hero-col-teal">
+      <div class="col-stat">
+        <div class="stat-num">50+</div>
+        <div class="stat-label">Projects Done</div>
+      </div>
+      <div class="col-stat">
+        <div class="stat-num">8+</div>
+        <div class="stat-label">Years Exp.</div>
+      </div>
+      <div class="col-stat">
+        <div class="stat-num">100%</div>
+        <div class="stat-label">Committed</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="about-grid">
+      <div>
+        <p class="about-label">About Me</p>
+        <h2 class="about-heading">Strategy meets<br><em>creativity</em></h2>
+        <p class="about-text">
+          I'm Winnie — a strategist and digital specialist with a passion for
+          turning complex challenges into clear, actionable growth plans.
+          Whether it's brand positioning, digital campaigns, or business
+          consulting, I bring both analytical rigour and creative vision.
+        </p>
+        <p class="about-text">
+          My approach is data-informed and people-driven. Every decision I
+          make is grounded in real insight and built for lasting impact.
+        </p>
+        <a class="about-link" href="#services">See what I do &rarr;</a>
+      </div>
+      <div class="about-visual">
+        <div class="av-block av-1">Strategy<br>& Vision</div>
+        <div class="av-block av-2">Digital<br>Growth</div>
+        <div class="av-block av-3">Creative<br>Execution</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICES -->
+  <section id="services">
+    <div class="services-header">
+      <div>
+        <p class="services-label">What I Do</p>
+        <h2 class="services-heading">Services Built<br>for Growth</h2>
+      </div>
+      <p class="services-sub">
+        End-to-end expertise from strategy to execution —
+        so you never have to coordinate between agencies.
+      </p>
+    </div>
+    <div class="services-grid">
+      <div class="service-card">
+        <p class="service-num">01</p>
+        <div class="service-icon si-1">📊</div>
+        <h3 class="service-title">Business Strategy</h3>
+        <p class="service-desc">Go-to-market planning, competitive analysis, and growth frameworks tailored to your business goals.</p>
+      </div>
+      <div class="service-card">
+        <p class="service-num">02</p>
+        <div class="service-icon si-2">📱</div>
+        <h3 class="service-title">Digital Marketing</h3>
+        <p class="service-desc">SEO, social media, paid ads, and content strategy that drive measurable results and real engagement.</p>
+      </div>
+      <div class="service-card">
+        <p class="service-num">03</p>
+        <div class="service-icon si-3">🎨</div>
+        <h3 class="service-title">Brand Identity</h3>
+        <p class="service-desc">Positioning, messaging, and visual identity that makes your brand unforgettable in a crowded market.</p>
+      </div>
+      <div class="service-card">
+        <p class="service-num">04</p>
+        <div class="service-icon si-4">💡</div>
+        <h3 class="service-title">Consulting</h3>
+        <p class="service-desc">Strategic advisory for startups and SMEs navigating growth challenges, pivots, or market entry.</p>
+      </div>
+      <div class="service-card">
+        <p class="service-num">05</p>
+        <div class="service-icon si-5">🌐</div>
+        <h3 class="service-title">Web & Content</h3>
+        <p class="service-desc">Website strategy, copywriting, and content systems that convert visitors into loyal customers.</p>
+      </div>
+      <div class="service-card">
+        <p class="service-num">06</p>
+        <div class="service-icon si-6">📈</div>
+        <h3 class="service-title">Analytics & Insights</h3>
+        <p class="service-desc">Data analysis and reporting that turn raw numbers into strategic decisions and competitive advantage.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- NUMBERS BAND -->
+  <div class="numbers-band">
+    <div class="number-item">
+      <div class="number-val">50+</div>
+      <div class="number-label">Projects Delivered</div>
+    </div>
+    <div class="number-item">
+      <div class="number-val">30+</div>
+      <div class="number-label">Happy Clients</div>
+    </div>
+    <div class="number-item">
+      <div class="number-val">8yr</div>
+      <div class="number-label">Experience</div>
+    </div>
+    <div class="number-item">
+      <div class="number-val">3x</div>
+      <div class="number-label">Avg. Growth Lift</div>
+    </div>
+  </div>
+
+  <!-- WORK -->
+  <section id="work">
+    <p class="work-label">Portfolio</p>
+    <h2 class="work-heading">Selected Work</h2>
+    <div class="work-grid">
+      <div class="work-item">
+        <div class="work-item-bg wi-1">🚀</div>
+        <div class="work-overlay">
+          <p class="work-tag">Strategy & Branding</p>
+          <h3 class="work-title">Brand Relaunch —<br>Tech Startup</h3>
+        </div>
+      </div>
+      <div class="work-item">
+        <div class="work-item-bg wi-2">📊</div>
+        <div class="work-overlay">
+          <p class="work-tag">Digital Marketing</p>
+          <h3 class="work-title">3× Revenue Growth<br>Campaign</h3>
+        </div>
+      </div>
+      <div class="work-item">
+        <div class="work-item-bg wi-3">🌐</div>
+        <div class="work-overlay">
+          <p class="work-tag">Market Entry</p>
+          <h3 class="work-title">Asia-Pacific<br>Go-To-Market</h3>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div>
+      <h2 class="contact-heading">Let's Build<br>Something<br>Great</h2>
+      <p class="contact-sub">
+        Ready to grow your brand or need strategic clarity?
+        I'd love to hear what you're working on.
+      </p>
+      <a class="contact-btn" href="mailto:winnieshih1107@gmail.com">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        EMAIL ME
+      </a>
+    </div>
+    <form class="contact-form" onsubmit="handleSubmit(event)">
+      <input type="text" placeholder="Your Name" required />
+      <input type="email" placeholder="Email Address" required />
+      <input type="text" placeholder="Subject" />
+      <textarea placeholder="Tell me about your project..."></textarea>
+      <button type="submit">SEND MESSAGE &rarr;</button>
+    </form>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-brand">WINNIE SHIH</div>
+    <p class="footer-copy">&copy; 2026 Winnie Shih. All rights reserved.</p>
+    <ul class="footer-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#work">Work</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </footer>
+
+  <script>
+    function toggleMenu() {
+      document.getElementById('mobileMenu').classList.toggle('open');
+    }
+
+    function handleSubmit(e) {
+      e.preventDefault();
+      const btn = e.target.querySelector('button');
+      btn.textContent = 'SENT! ✓';
+      btn.style.background = '#00c9a0';
+      btn.style.color = '#fff';
+      setTimeout(() => {
+        btn.textContent = 'SEND MESSAGE →';
+        btn.style.background = '';
+        btn.style.color = '';
+        e.target.reset();
+      }, 3000);
+    }
+
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.style.opacity = '1';
+          e.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.service-card, .work-item, .number-item').forEach(el => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(20px)';
+      el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+      observer.observe(el);
+    });
+
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-links a');
+    window.addEventListener('scroll', () => {
+      let cur = '';
+      sections.forEach(s => { if (window.scrollY >= s.offsetTop - 100) cur = s.id; });
+      navLinks.forEach(a => {
+        a.style.color = a.getAttribute('href') === `#${cur}` ? '#fff' : 'rgba(255,255,255,0.6)';
+      });
+    });
+  </script>
+</body>
+</html>
