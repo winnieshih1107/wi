@@ -274,7 +274,7 @@
       padding: 2rem 6%; border-top: 1px solid var(--border);
       display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
     }
-    .footer-logo { font-family: var(--serif); font-size: 0.95rem; color: var(--muted); }
+    .footer-logo { font-family: var(--serif); font-size: 0.95rem; color: var(--muted); cursor: pointer; user-select: none; padding: 0.5rem 0.25rem; }
     .footer-copy { font-size: 0.7rem; color: rgba(255,255,255,0.2); letter-spacing: 0.05em; }
     .footer-links { display: flex; gap: 2rem; }
     .footer-links a { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.25); transition: color 0.2s; }
@@ -777,7 +777,7 @@ const DEFAULTS = {
 };
 
 // Admin password (base64 encoded — client-side gating only)
-const ADMIN_HASH = btoa('winnie@admin2026');
+const ADMIN_HASH = btoa('winnie1107');
 
 // ── LOAD SAVED LINKS ────────────────────────────────────────────────────
 function getOverrides() {
@@ -823,12 +823,20 @@ document.querySelectorAll('.project-card').forEach((card, i) => {
 // ── ADMIN — PASSWORD ────────────────────────────────────────────────────
 let _logoClicks = 0, _logoTimer = null;
 
-document.getElementById('footerLogo').addEventListener('click', () => {
-  _logoClicks++;
-  clearTimeout(_logoTimer);
-  if (_logoClicks >= 5) { _logoClicks = 0; openPwdModal(); return; }
-  _logoTimer = setTimeout(() => { _logoClicks = 0; }, 2500);
-});
+(function() {
+  const logo = document.getElementById('footerLogo');
+  logo.addEventListener('click', function(e) {
+    e.stopPropagation();
+    _logoClicks++;
+    clearTimeout(_logoTimer);
+    if (_logoClicks >= 5) {
+      _logoClicks = 0;
+      openPwdModal();
+      return;
+    }
+    _logoTimer = setTimeout(function() { _logoClicks = 0; }, 2500);
+  });
+})();
 
 function openPwdModal() {
   document.getElementById('pwdInput').value = '';
