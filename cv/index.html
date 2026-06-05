@@ -319,6 +319,121 @@
       .works-grid { gap: 1px; }
       .hero-cta-group { flex-direction: column; align-items: flex-start; }
     }
+
+    /* ── ADMIN ── */
+    .admin-bar {
+      display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 950;
+      background: rgba(229,195,73,0.97); backdrop-filter: blur(8px);
+      padding: 0.65rem 6%; height: 52px;
+      align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .admin-bar.active { display: flex; }
+    .admin-bar-left { display: flex; align-items: center; gap: 10px; }
+    .admin-badge {
+      font-size: 0.65rem; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase;
+      background: #080808; color: var(--gold); padding: 0.25rem 0.6rem; border-radius: 2px;
+    }
+    .admin-bar-msg { font-size: 0.78rem; font-weight: 600; color: #080808; }
+    .admin-bar-right { display: flex; gap: 0.75rem; }
+    .admin-btn {
+      padding: 0.4rem 1rem; border-radius: 2px; cursor: pointer; border: none;
+      font-family: var(--sans); font-size: 0.72rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase; transition: opacity 0.2s;
+    }
+    .admin-btn:hover { opacity: 0.8; }
+    .admin-btn-exit { background: #080808; color: var(--gold); }
+    .admin-btn-reset { background: rgba(0,0,0,0.15); color: #080808; }
+
+    /* Edit button on each card */
+    .project-edit-btn {
+      display: none; position: absolute; top: 1rem; left: 50%; transform: translateX(-50%);
+      z-index: 10; padding: 0.45rem 1.1rem;
+      background: var(--gold); color: #080808;
+      border: none; border-radius: 2px; cursor: pointer;
+      font-family: var(--sans); font-size: 0.72rem; font-weight: 800;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4); transition: opacity 0.2s;
+    }
+    .project-edit-btn:hover { opacity: 0.85; }
+    body.admin-mode .project-edit-btn { display: block; }
+    body.admin-mode .project-card { outline: 1.5px dashed rgba(229,195,73,0.25); }
+    body.admin-mode .project-card:hover { outline-color: var(--gold); }
+
+    /* Admin modal */
+    .admin-modal-backdrop {
+      display: none; position: fixed; inset: 0; z-index: 1000;
+      background: rgba(0,0,0,0.75); backdrop-filter: blur(6px);
+      align-items: center; justify-content: center; padding: 1rem;
+    }
+    .admin-modal-backdrop.open { display: flex; }
+    .admin-modal {
+      background: #111; border: 1px solid rgba(229,195,73,0.2); border-radius: 6px;
+      width: 100%; max-width: 480px; padding: 2rem;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.5); animation: mIn 0.22s ease;
+    }
+    @keyframes mIn { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+    .admin-modal-title {
+      font-family: var(--serif); font-size: 1.25rem; font-weight: 700; margin-bottom: 0.3rem;
+    }
+    .admin-modal-sub { font-size: 0.78rem; color: var(--muted); margin-bottom: 1.75rem; }
+    .aform-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1rem; }
+    .aform-label { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.45); }
+    .aform-input {
+      padding: 0.7rem 1rem; background: #1a1a1a;
+      border: 1.5px solid rgba(255,255,255,0.1); border-radius: 3px;
+      color: var(--white); font-size: 0.9rem; font-family: inherit; outline: none;
+      transition: border-color 0.2s;
+    }
+    .aform-input:focus { border-color: var(--gold); }
+    .aform-row { display: flex; gap: 0.75rem; margin-top: 1.5rem; }
+    .aform-save {
+      flex: 1; padding: 0.8rem; background: var(--gold); color: #080808;
+      border: none; border-radius: 2px; cursor: pointer;
+      font-family: var(--sans); font-size: 0.8rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase; transition: opacity 0.2s;
+    }
+    .aform-save:hover { opacity: 0.85; }
+    .aform-cancel {
+      padding: 0.8rem 1.5rem; background: transparent; color: var(--muted);
+      border: 1px solid rgba(255,255,255,0.1); border-radius: 2px; cursor: pointer;
+      font-family: var(--sans); font-size: 0.8rem; font-weight: 600;
+      letter-spacing: 0.1em; text-transform: uppercase; transition: border-color 0.2s;
+    }
+    .aform-cancel:hover { border-color: rgba(255,255,255,0.3); }
+
+    /* Password modal */
+    .pwd-modal-backdrop {
+      display: none; position: fixed; inset: 0; z-index: 1100;
+      background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+      align-items: center; justify-content: center; padding: 1rem;
+    }
+    .pwd-modal-backdrop.open { display: flex; }
+    .pwd-modal {
+      background: #111; border: 1px solid rgba(229,195,73,0.2); border-radius: 6px;
+      width: 100%; max-width: 380px; padding: 2.5rem 2rem; text-align: center;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.6); animation: mIn 0.22s ease;
+    }
+    .pwd-logo { font-size: 2rem; margin-bottom: 1rem; }
+    .pwd-title { font-family: var(--serif); font-size: 1.4rem; font-weight: 700; margin-bottom: 0.3rem; }
+    .pwd-sub { font-size: 0.8rem; color: var(--muted); margin-bottom: 1.5rem; }
+    .pwd-input {
+      width: 100%; padding: 0.8rem 1rem; text-align: center;
+      background: #1a1a1a; border: 1.5px solid rgba(255,255,255,0.1); border-radius: 3px;
+      color: var(--white); font-size: 1.1rem; font-family: inherit; outline: none;
+      letter-spacing: 0.2em; transition: border-color 0.2s; margin-bottom: 0.75rem;
+    }
+    .pwd-input:focus { border-color: var(--gold); }
+    .pwd-input.error { border-color: #ef4444; }
+    .pwd-err { font-size: 0.75rem; color: #ef4444; margin-bottom: 0.75rem; min-height: 1em; }
+    .pwd-submit {
+      width: 100%; padding: 0.85rem; background: var(--gold); color: #080808;
+      border: none; border-radius: 2px; cursor: pointer;
+      font-family: var(--sans); font-size: 0.82rem; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase; transition: opacity 0.2s;
+    }
+    .pwd-submit:hover { opacity: 0.85; }
+    .pwd-cancel-link { display: block; margin-top: 1rem; font-size: 0.72rem; color: var(--muted); cursor: pointer; }
+    .pwd-cancel-link:hover { color: var(--white); }
   </style>
 </head>
 <body>
@@ -385,7 +500,8 @@
   <div class="works-grid">
 
     <!-- 01 — Cosmos AI Studio (WIDE, flagship) -->
-    <article class="project-card wide reveal">
+    <article class="project-card wide reveal" data-pid="01">
+      <button class="project-edit-btn" onclick="openEdit('01')">✎ Edit Link</button>
       <div class="project-preview">
         <div class="project-preview-bg g3">🤖</div>
         <div class="project-preview-overlay"></div>
@@ -402,15 +518,16 @@
           <h3 class="project-title">Cosmos 3 AI Image Studio</h3>
           <p class="project-desc">NVIDIA-style text-to-image generation studio with Gemini prompt expansion, 6 style presets, Hugging Face multi-model switching, and a real-time lightbox gallery. Deployed on Streamlit Cloud.</p>
         </div>
-        <a class="project-link" href="../260604/cosmos3_image_studio.html" target="_blank">
-          View Demo
+        <a class="project-link" data-pid="01" href="../260604/cosmos3_image_studio.html" target="_blank">
+          <span class="link-label">View Demo</span>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </a>
       </div>
     </article>
 
     <!-- 02 — Interactive Clock -->
-    <article class="project-card reveal">
+    <article class="project-card reveal" data-pid="02">
+      <button class="project-edit-btn" onclick="openEdit('02')">✎ Edit Link</button>
       <div class="project-preview">
         <div class="project-preview-bg g1">🕐</div>
         <div class="project-preview-overlay"></div>
@@ -426,15 +543,16 @@
           <h3 class="project-title">Interactive Live Clock</h3>
           <p class="project-desc">Glassmorphic greeting page with real-time clock, ambient dynamic greetings by time-of-day, 3D tilt on hover, and dark/light theme toggle.</p>
         </div>
-        <a class="project-link" href="../260529/index.html" target="_blank">
-          View Demo
+        <a class="project-link" data-pid="02" href="../260529/index.html" target="_blank">
+          <span class="link-label">View Demo</span>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </a>
       </div>
     </article>
 
     <!-- 03 — Consulting Landing Page -->
-    <article class="project-card reveal">
+    <article class="project-card reveal" data-pid="03">
+      <button class="project-edit-btn" onclick="openEdit('03')">✎ Edit Link</button>
       <div class="project-preview">
         <div class="project-preview-bg g2">💼</div>
         <div class="project-preview-overlay"></div>
@@ -450,15 +568,16 @@
           <h3 class="project-title">Consulting Landing Page</h3>
           <p class="project-desc">Premium strategy consulting firm website with serif typography, gold accent system, animated service cards, and a full-featured contact section.</p>
         </div>
-        <a class="project-link" href="../260529/consulting.html" target="_blank">
-          View Demo
+        <a class="project-link" data-pid="03" href="../260529/consulting.html" target="_blank">
+          <span class="link-label">View Demo</span>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </a>
       </div>
     </article>
 
     <!-- 04 — Travel Journal (WIDE) -->
-    <article class="project-card wide reveal">
+    <article class="project-card wide reveal" data-pid="04">
+      <button class="project-edit-btn" onclick="openEdit('04')">✎ Edit Link</button>
       <div class="project-preview">
         <div class="project-preview-bg g5">🗺️</div>
         <div class="project-preview-overlay"></div>
@@ -474,15 +593,16 @@
           <h3 class="project-title">Life Journey Map</h3>
           <p class="project-desc">Interactive world travel journal — click anywhere on the map to pin a location, upload trip photos, and write diary entries. All data saved locally in the browser. Geocoding powered by Nominatim.</p>
         </div>
-        <a class="project-link" href="../travel.html" target="_blank">
-          View Demo
+        <a class="project-link" data-pid="04" href="../travel.html" target="_blank">
+          <span class="link-label">View Demo</span>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </a>
       </div>
     </article>
 
     <!-- 05 — Video Note Helper -->
-    <article class="project-card reveal">
+    <article class="project-card reveal" data-pid="05">
+      <button class="project-edit-btn" onclick="openEdit('05')">✎ Edit Link</button>
       <div class="project-preview">
         <div class="project-preview-bg g4">🎬</div>
         <div class="project-preview-overlay"></div>
@@ -498,15 +618,16 @@
           <h3 class="project-title">Video Note Helper</h3>
           <p class="project-desc">Python CLI tool that auto-transcribes video using Faster-Whisper, captures screenshots every 30 seconds, and exports a fully-styled HTML notebook with timestamps.</p>
         </div>
-        <a class="project-link" href="https://github.com/winnieshih1107/wi/blob/main/260602/video_note_helper.py" target="_blank">
-          View Code
+        <a class="project-link" data-pid="05" href="https://github.com/winnieshih1107/wi/blob/main/260602/video_note_helper.py" target="_blank">
+          <span class="link-label">View Code</span>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </a>
       </div>
     </article>
 
     <!-- 06 — Agency Portfolio -->
-    <article class="project-card reveal">
+    <article class="project-card reveal" data-pid="06">
+      <button class="project-edit-btn" onclick="openEdit('06')">✎ Edit Link</button>
       <div class="project-preview">
         <div class="project-preview-bg g6">🎨</div>
         <div class="project-preview-overlay"></div>
@@ -522,8 +643,8 @@
           <h3 class="project-title">Agency-Style Personal Site</h3>
           <p class="project-desc">Bold digital-marketing agency aesthetic adapted into a personal branding site. Featuring multi-column hero layout, animated service cards, and a live contact form.</p>
         </div>
-        <a class="project-link" href="../winnie.html" target="_blank">
-          View Demo
+        <a class="project-link" data-pid="06" href="../winnie.html" target="_blank">
+          <span class="link-label">View Demo</span>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </a>
       </div>
@@ -587,9 +708,55 @@
   </div>
 </section>
 
+<!-- ADMIN BAR (visible only in admin mode) -->
+<div class="admin-bar" id="adminBar">
+  <div class="admin-bar-left">
+    <span class="admin-badge">Admin</span>
+    <span class="admin-bar-msg">點擊各專案的 <strong>✎ Edit Link</strong> 按鈕以修改連結</span>
+  </div>
+  <div class="admin-bar-right">
+    <button class="admin-btn admin-btn-reset" onclick="resetLinks()">↺ 還原預設</button>
+    <button class="admin-btn admin-btn-exit"  onclick="exitAdmin()">✕ 退出管理</button>
+  </div>
+</div>
+
+<!-- PASSWORD MODAL -->
+<div class="pwd-modal-backdrop" id="pwdModal">
+  <div class="pwd-modal">
+    <div class="pwd-logo">🔐</div>
+    <h2 class="pwd-title">管理員登入</h2>
+    <p class="pwd-sub">請輸入管理員密碼以進入編輯模式</p>
+    <input class="pwd-input" id="pwdInput" type="password" placeholder="••••••••"
+      onkeydown="if(event.key==='Enter')checkPwd()" />
+    <p class="pwd-err" id="pwdErr"></p>
+    <button class="pwd-submit" onclick="checkPwd()">進入管理模式</button>
+    <span class="pwd-cancel-link" onclick="closePwdModal()">取消</span>
+  </div>
+</div>
+
+<!-- EDIT LINK MODAL -->
+<div class="admin-modal-backdrop" id="editModal">
+  <div class="admin-modal">
+    <h3 class="admin-modal-title">✎ 編輯專案連結</h3>
+    <p class="admin-modal-sub" id="editModalSub">專案 01</p>
+    <div class="aform-group">
+      <label class="aform-label">按鈕文字</label>
+      <input class="aform-input" id="editLabel" placeholder="View Demo" />
+    </div>
+    <div class="aform-group">
+      <label class="aform-label">目標網址 URL</label>
+      <input class="aform-input" id="editUrl" placeholder="https://..." type="url" />
+    </div>
+    <div class="aform-row">
+      <button class="aform-save" onclick="saveEdit()">儲存</button>
+      <button class="aform-cancel" onclick="closeEditModal()">取消</button>
+    </div>
+  </div>
+</div>
+
 <!-- FOOTER -->
 <footer>
-  <div class="footer-logo">Winnie Shih</div>
+  <div class="footer-logo" id="footerLogo" title="點擊 5 次進入管理模式">Winnie Shih</div>
   <p class="footer-copy">&copy; 2026 · Built with HTML, CSS & curiosity.</p>
   <ul class="footer-links">
     <li><a href="#works">Works</a></li>
@@ -599,18 +766,47 @@
 </footer>
 
 <script>
-// Nav scroll effect
+// ── DEFAULTS ────────────────────────────────────────────────────────────
+const DEFAULTS = {
+  '01': { url: '../260604/cosmos3_image_studio.html', label: 'View Demo' },
+  '02': { url: '../260529/index.html',                label: 'View Demo' },
+  '03': { url: '../260529/consulting.html',            label: 'View Demo' },
+  '04': { url: '../travel.html',                       label: 'View Demo' },
+  '05': { url: 'https://github.com/winnieshih1107/wi/blob/main/260602/video_note_helper.py', label: 'View Code' },
+  '06': { url: '../winnie.html',                       label: 'View Demo' },
+};
+
+// Admin password (base64 encoded — client-side gating only)
+const ADMIN_HASH = btoa('winnie@admin2026');
+
+// ── LOAD SAVED LINKS ────────────────────────────────────────────────────
+function getOverrides() {
+  return JSON.parse(localStorage.getItem('cv_links') || '{}');
+}
+function applyLinks() {
+  const overrides = getOverrides();
+  document.querySelectorAll('.project-link[data-pid]').forEach(a => {
+    const pid  = a.dataset.pid;
+    const data = { ...DEFAULTS[pid], ...(overrides[pid] || {}) };
+    a.href = data.url;
+    const lbl = a.querySelector('.link-label');
+    if (lbl) lbl.textContent = data.label;
+  });
+}
+applyLinks();
+
+// ── NAV SCROLL ─────────────────────────────────────────────────────────
 const nav = document.getElementById('nav');
 window.addEventListener('scroll', () => {
   nav.classList.toggle('scrolled', window.scrollY > 40);
 }, { passive: true });
 
-// Mobile menu
+// ── MOBILE MENU ─────────────────────────────────────────────────────────
 function toggleMobile() {
   document.getElementById('mobileNav').classList.toggle('open');
 }
 
-// Scroll reveal
+// ── SCROLL REVEAL ───────────────────────────────────────────────────────
 const revealObserver = new IntersectionObserver(entries => {
   entries.forEach(e => {
     if (e.isIntersecting) {
@@ -620,10 +816,100 @@ const revealObserver = new IntersectionObserver(entries => {
   });
 }, { threshold: 0.08 });
 document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
-
-// Stagger children of works-grid
 document.querySelectorAll('.project-card').forEach((card, i) => {
   card.style.transitionDelay = `${(i % 2) * 0.1}s`;
+});
+
+// ── ADMIN — PASSWORD ────────────────────────────────────────────────────
+let _logoClicks = 0, _logoTimer = null;
+
+document.getElementById('footerLogo').addEventListener('click', () => {
+  _logoClicks++;
+  clearTimeout(_logoTimer);
+  if (_logoClicks >= 5) { _logoClicks = 0; openPwdModal(); return; }
+  _logoTimer = setTimeout(() => { _logoClicks = 0; }, 2500);
+});
+
+function openPwdModal() {
+  document.getElementById('pwdInput').value = '';
+  document.getElementById('pwdErr').textContent = '';
+  document.getElementById('pwdInput').classList.remove('error');
+  document.getElementById('pwdModal').classList.add('open');
+  setTimeout(() => document.getElementById('pwdInput').focus(), 100);
+}
+function closePwdModal() {
+  document.getElementById('pwdModal').classList.remove('open');
+}
+function checkPwd() {
+  const val = document.getElementById('pwdInput').value;
+  if (btoa(val) === ADMIN_HASH) {
+    closePwdModal();
+    enterAdmin();
+  } else {
+    document.getElementById('pwdInput').classList.add('error');
+    document.getElementById('pwdErr').textContent = '密碼錯誤，請再試一次';
+    document.getElementById('pwdInput').value = '';
+    setTimeout(() => {
+      document.getElementById('pwdInput').classList.remove('error');
+      document.getElementById('pwdErr').textContent = '';
+    }, 2500);
+  }
+}
+
+// ── ADMIN — MODE ────────────────────────────────────────────────────────
+function enterAdmin() {
+  document.body.classList.add('admin-mode');
+  document.getElementById('adminBar').classList.add('active');
+  document.body.style.paddingBottom = '52px';
+}
+function exitAdmin() {
+  document.body.classList.remove('admin-mode');
+  document.getElementById('adminBar').classList.remove('active');
+  document.body.style.paddingBottom = '';
+}
+function resetLinks() {
+  if (!confirm('確定要還原所有連結至預設值？')) return;
+  localStorage.removeItem('cv_links');
+  applyLinks();
+}
+
+// ── ADMIN — EDIT MODAL ──────────────────────────────────────────────────
+let _editPid = null;
+
+function openEdit(pid) {
+  _editPid = pid;
+  const overrides = getOverrides();
+  const data = { ...DEFAULTS[pid], ...(overrides[pid] || {}) };
+  const card = document.querySelector(`.project-card[data-pid="${pid}"]`);
+  const title = card ? card.querySelector('.project-title')?.textContent : `專案 ${pid}`;
+  document.getElementById('editModalSub').textContent = `${pid} · ${title}`;
+  document.getElementById('editLabel').value = data.label;
+  document.getElementById('editUrl').value   = data.url;
+  document.getElementById('editModal').classList.add('open');
+  setTimeout(() => document.getElementById('editUrl').focus(), 80);
+}
+function closeEditModal() {
+  document.getElementById('editModal').classList.remove('open');
+  _editPid = null;
+}
+function saveEdit() {
+  if (!_editPid) return;
+  const label = document.getElementById('editLabel').value.trim();
+  const url   = document.getElementById('editUrl').value.trim();
+  if (!url) { alert('請填寫網址'); return; }
+  const overrides = getOverrides();
+  overrides[_editPid] = { label: label || DEFAULTS[_editPid].label, url };
+  localStorage.setItem('cv_links', JSON.stringify(overrides));
+  applyLinks();
+  closeEditModal();
+}
+
+// Close modals on backdrop click
+document.getElementById('pwdModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('pwdModal')) closePwdModal();
+});
+document.getElementById('editModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('editModal')) closeEditModal();
 });
 </script>
 </body>
