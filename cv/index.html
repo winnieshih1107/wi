@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Winnie Shih — Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ── TOKENS ── */
+    :root {
+      --bg:      #080808;
+      --surface: #111111;
+      --border:  rgba(255,255,255,0.07);
+      --white:   #FFFFFF;
+      --muted:   rgba(255,255,255,0.38);
+      --gold:    #E5C349;
+      --serif:   'Playfair Display', Georgia, serif;
+      --sans:    'Inter', system-ui, sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body { font-family: var(--sans); background: var(--bg); color: var(--white); overflow-x: hidden; }
+    a { color: inherit; text-decoration: none; }
+    ul { list-style: none; }
+    img { display: block; max-width: 100%; }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 900;
+      padding: 0 6%; height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid transparent;
+      transition: background 0.35s, border-color 0.35s;
+    }
+    nav.scrolled { background: rgba(8,8,8,0.92); backdrop-filter: blur(16px); border-color: var(--border); }
+    .nav-logo {
+      font-family: var(--serif); font-size: 1.15rem; font-weight: 700;
+      letter-spacing: 0.04em; color: var(--white);
+    }
+    .nav-logo em { font-style: italic; color: var(--gold); }
+    .nav-links { display: flex; gap: 2.5rem; align-items: center; }
+    .nav-links a {
+      font-size: 0.75rem; font-weight: 500; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--muted); transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--white); }
+    .nav-cta {
+      padding: 0.45rem 1.25rem;
+      border: 1px solid rgba(255,255,255,0.25); border-radius: 2px;
+      font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--white) !important; transition: border-color 0.2s, background 0.2s !important;
+    }
+    .nav-cta:hover { border-color: var(--gold); background: rgba(229,195,73,0.08) !important; }
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; }
+    .hamburger span { display: block; width: 22px; height: 1.5px; background: var(--white); transition: 0.3s; }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh; padding: 0 6%;
+      display: flex; flex-direction: column; justify-content: center;
+      position: relative; overflow: hidden;
+    }
+    .hero-grid-lines {
+      position: absolute; inset: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 80px 80px;
+      mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+    }
+    .hero-noise {
+      position: absolute; inset: 0; pointer-events: none; opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    }
+    .hero-kicker {
+      font-size: 0.72rem; font-weight: 600; letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 1.5rem;
+      display: flex; align-items: center; gap: 14px;
+      opacity: 0; animation: fadeUp 0.8s 0.2s forwards;
+    }
+    .hero-kicker::before { content: ''; width: 36px; height: 1px; background: var(--gold); }
+    .hero-name {
+      font-family: var(--serif); font-weight: 900; line-height: 0.92;
+      font-size: clamp(4.5rem, 13vw, 11rem); letter-spacing: -0.02em;
+      color: var(--white); margin-bottom: 1.25rem;
+      opacity: 0; animation: fadeUp 0.9s 0.35s forwards;
+    }
+    .hero-name span { color: var(--gold); }
+    .hero-row {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      gap: 2rem; flex-wrap: wrap;
+      opacity: 0; animation: fadeUp 0.8s 0.55s forwards;
+    }
+    .hero-role {
+      font-size: clamp(0.95rem, 2vw, 1.15rem); color: var(--muted);
+      line-height: 1.65; max-width: 460px;
+    }
+    .hero-role strong { color: var(--white); font-weight: 600; }
+    .hero-cta-group { display: flex; gap: 1rem; align-items: center; flex-shrink: 0; }
+    .btn-primary {
+      padding: 0.85rem 2rem; background: var(--gold); color: #080808;
+      border: none; border-radius: 2px; cursor: pointer;
+      font-family: var(--sans); font-size: 0.8rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase; transition: opacity 0.2s;
+    }
+    .btn-primary:hover { opacity: 0.85; }
+    .btn-ghost {
+      padding: 0.85rem 2rem; background: transparent; color: var(--white);
+      border: 1px solid var(--border); border-radius: 2px; cursor: pointer;
+      font-family: var(--sans); font-size: 0.8rem; font-weight: 600;
+      letter-spacing: 0.1em; text-transform: uppercase; transition: border-color 0.2s;
+    }
+    .btn-ghost:hover { border-color: rgba(255,255,255,0.4); }
+    .hero-scroll-hint {
+      position: absolute; bottom: 2.5rem; right: 6%;
+      display: flex; align-items: center; gap: 10px;
+      font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted);
+      opacity: 0; animation: fadeUp 0.8s 0.9s forwards;
+    }
+    .hero-scroll-hint::after { content: ''; width: 40px; height: 1px; background: var(--muted); }
+    .hero-counter {
+      position: absolute; bottom: 2.5rem; left: 6%;
+      font-family: var(--serif); font-size: 0.78rem; color: var(--muted);
+      opacity: 0; animation: fadeUp 0.8s 0.9s forwards;
+    }
+
+    /* ── WORKS ── */
+    #works { padding: 7rem 6% 5rem; }
+    .section-header { margin-bottom: 4rem; display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; flex-wrap: wrap; }
+    .section-eyebrow { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.6rem; }
+    .section-title { font-family: var(--serif); font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 900; line-height: 1.05; letter-spacing: -0.02em; }
+    .section-note { font-size: 0.85rem; color: var(--muted); line-height: 1.7; max-width: 320px; text-align: right; }
+
+    /* Project grid */
+    .works-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
+
+    .project-card {
+      position: relative; overflow: hidden; cursor: pointer;
+      background: var(--surface);
+      display: flex; flex-direction: column;
+    }
+    .project-card.wide { grid-column: span 2; }
+
+    /* Preview area */
+    .project-preview {
+      aspect-ratio: 16/7; position: relative; overflow: hidden;
+    }
+    .project-card.wide .project-preview { aspect-ratio: 16/6; }
+    .project-preview-bg {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: clamp(3rem, 6vw, 6rem);
+      transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .project-card:hover .project-preview-bg { transform: scale(1.06); }
+    .project-preview-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(8,8,8,0.8) 0%, transparent 60%);
+    }
+    .project-num {
+      position: absolute; top: 1.5rem; left: 1.5rem;
+      font-family: var(--serif); font-size: 0.9rem; font-weight: 700;
+      color: rgba(255,255,255,0.35); letter-spacing: 0.05em;
+    }
+    .project-tags {
+      position: absolute; top: 1.5rem; right: 1.5rem;
+      display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end;
+    }
+    .tag {
+      padding: 0.18rem 0.55rem; border-radius: 2px; border: 1px solid rgba(255,255,255,0.15);
+      font-size: 0.62rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+      color: rgba(255,255,255,0.6); background: rgba(0,0,0,0.35); backdrop-filter: blur(4px);
+    }
+
+    /* Project info */
+    .project-info {
+      padding: 1.5rem 2rem 1.75rem;
+      display: flex; align-items: flex-end; justify-content: space-between; gap: 1.5rem;
+      border-top: 1px solid var(--border);
+      transition: border-color 0.3s;
+    }
+    .project-card:hover .project-info { border-color: rgba(229,195,73,0.3); }
+    .project-title { font-family: var(--serif); font-size: clamp(1.1rem, 2.2vw, 1.5rem); font-weight: 700; line-height: 1.25; margin-bottom: 0.4rem; }
+    .project-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.6; max-width: 520px; }
+    .project-link {
+      flex-shrink: 0; display: inline-flex; align-items: center; gap: 8px;
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--gold); white-space: nowrap;
+      border-bottom: 1px solid transparent; padding-bottom: 1px;
+      transition: border-color 0.2s;
+    }
+    .project-link:hover { border-color: var(--gold); }
+    .project-link svg { width: 14px; height: 14px; transition: transform 0.2s; }
+    .project-link:hover svg { transform: translateX(3px); }
+
+    /* Gradient presets */
+    .g1 { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #4f46e5 70%, #818cf8 100%); }
+    .g2 { background: linear-gradient(135deg, #1a0f05 0%, #3d2b1f 50%, #b8975a 100%); }
+    .g3 { background: linear-gradient(135deg, #001a00 0%, #003300 40%, #00c853 80%, #69f0ae 100%); }
+    .g4 { background: linear-gradient(135deg, #001d3d 0%, #003566 50%, #0077b6 80%, #00b4d8 100%); }
+    .g5 { background: linear-gradient(135deg, #3d0000 0%, #7f1d1d 40%, #ef4444 75%, #fca5a5 100%); }
+    .g6 { background: linear-gradient(135deg, #1a1a00 0%, #523a00 40%, #d97706 75%, #fcd34d 100%); }
+
+    /* ── ABOUT ── */
+    #about {
+      padding: 7rem 6%;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; align-items: center;
+      border-top: 1px solid var(--border);
+    }
+    .about-kicker { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold); margin-bottom: 1rem; }
+    .about-heading { font-family: var(--serif); font-size: clamp(2rem, 4vw, 3rem); font-weight: 900; line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 1.5rem; }
+    .about-heading em { font-style: italic; color: var(--gold); font-weight: 400; }
+    .about-text { font-size: 0.95rem; color: var(--muted); line-height: 1.85; margin-bottom: 1rem; }
+    .about-links { display: flex; gap: 1.5rem; margin-top: 2rem; flex-wrap: wrap; }
+    .about-link {
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--white); border-bottom: 1px solid var(--border); padding-bottom: 3px; transition: border-color 0.2s, color 0.2s;
+    }
+    .about-link:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* Skills */
+    .skills-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; }
+    .skill-block {
+      background: var(--surface); padding: 1.75rem 1.5rem;
+      transition: background 0.2s;
+    }
+    .skill-block:hover { background: #1a1a1a; }
+    .skill-icon { font-size: 1.6rem; margin-bottom: 0.75rem; }
+    .skill-name { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.35rem; }
+    .skill-items { font-size: 0.78rem; color: var(--muted); line-height: 1.6; }
+
+    /* ── STATS BAND ── */
+    .stats-band {
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      display: flex;
+    }
+    .stat-item {
+      flex: 1; padding: 2.5rem 4%;
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-num { font-family: var(--serif); font-size: clamp(2rem, 4vw, 3rem); font-weight: 900; color: var(--gold); line-height: 1; }
+    .stat-label { font-size: 0.72rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+
+    /* ── CONTACT ── */
+    #contact {
+      padding: 8rem 6%;
+      text-align: center;
+      background: radial-gradient(ellipse 70% 60% at 50% 100%, rgba(229,195,73,0.05) 0%, transparent 70%);
+    }
+    .contact-kicker { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold); margin-bottom: 1.25rem; }
+    .contact-heading { font-family: var(--serif); font-size: clamp(2.5rem, 7vw, 5.5rem); font-weight: 900; line-height: 0.95; letter-spacing: -0.03em; margin-bottom: 2.5rem; }
+    .contact-heading em { font-style: italic; color: var(--gold); font-weight: 400; }
+    .contact-email {
+      display: inline-flex; align-items: center; gap: 10px;
+      font-size: clamp(0.9rem, 2vw, 1.1rem); color: var(--muted);
+      border-bottom: 1px solid var(--border); padding-bottom: 4px;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .contact-email:hover { color: var(--white); border-color: var(--gold); }
+    .contact-socials { display: flex; gap: 2rem; justify-content: center; margin-top: 3rem; flex-wrap: wrap; }
+    .social-link {
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--muted); transition: color 0.2s;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .social-link:hover { color: var(--gold); }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 2rem 6%; border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+    }
+    .footer-logo { font-family: var(--serif); font-size: 0.95rem; color: var(--muted); }
+    .footer-copy { font-size: 0.7rem; color: rgba(255,255,255,0.2); letter-spacing: 0.05em; }
+    .footer-links { display: flex; gap: 2rem; }
+    .footer-links a { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.25); transition: color 0.2s; }
+    .footer-links a:hover { color: var(--gold); }
+
+    /* ── MOBILE MENU ── */
+    .mobile-nav {
+      display: none; position: fixed; inset: 0; z-index: 800;
+      background: var(--bg); flex-direction: column;
+      align-items: center; justify-content: center; gap: 2.5rem; padding-top: 64px;
+    }
+    .mobile-nav.open { display: flex; }
+    .mobile-nav a { font-family: var(--serif); font-size: 2rem; font-weight: 700; color: var(--white); transition: color 0.2s; }
+    .mobile-nav a:hover { color: var(--gold); }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .reveal {
+      opacity: 0; transform: translateY(28px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .works-grid { grid-template-columns: 1fr; }
+      .project-card.wide { grid-column: span 1; }
+      #about { grid-template-columns: 1fr; gap: 3rem; }
+      .section-note { text-align: left; }
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .stats-band { flex-wrap: wrap; }
+      .stat-item { flex: 1 1 50%; border-right: none; border-bottom: 1px solid var(--border); }
+      footer { flex-direction: column; text-align: center; }
+      .footer-links { justify-content: center; }
+    }
+    @media (max-width: 600px) {
+      .skills-grid { grid-template-columns: 1fr; }
+      .works-grid { gap: 1px; }
+      .hero-cta-group { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <a class="nav-logo" href="#"><em>W</em>innie Shih</a>
+  <ul class="nav-links">
+    <li><a href="#works">Works</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact" class="nav-cta">Contact</a></li>
+  </ul>
+  <button class="hamburger" id="ham" aria-label="menu" onclick="toggleMobile()">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- MOBILE NAV -->
+<div class="mobile-nav" id="mobileNav">
+  <a href="#works"   onclick="toggleMobile()">Works</a>
+  <a href="#about"   onclick="toggleMobile()">About</a>
+  <a href="#contact" onclick="toggleMobile()">Contact</a>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid-lines"></div>
+  <div class="hero-noise"></div>
+  <p class="hero-kicker">Portfolio · 2026</p>
+  <h1 class="hero-name">Winnie<br><span>Shih.</span></h1>
+  <div class="hero-row">
+    <p class="hero-role">
+      <strong>Strategy × Digital × AI</strong><br>
+      Building at the intersection of design, data, and emerging technology.
+      From interactive web apps to AI-powered tools — each project is a new experiment.
+    </p>
+    <div class="hero-cta-group">
+      <a class="btn-primary" href="#works">View Works</a>
+      <a class="btn-ghost"   href="#contact">Get in Touch</a>
+    </div>
+  </div>
+  <div class="hero-scroll-hint">Scroll to explore</div>
+  <div class="hero-counter">6 Projects</div>
+</section>
+
+<!-- STATS BAND -->
+<div class="stats-band reveal">
+  <div class="stat-item"><div class="stat-num">6+</div><div class="stat-label">Projects Built</div></div>
+  <div class="stat-item"><div class="stat-num">4</div><div class="stat-label">Tech Stacks</div></div>
+  <div class="stat-item"><div class="stat-num">3</div><div class="stat-label">AI Projects</div></div>
+  <div class="stat-item"><div class="stat-num">∞</div><div class="stat-label">Curiosity</div></div>
+</div>
+
+<!-- WORKS -->
+<section id="works">
+  <div class="section-header reveal">
+    <div>
+      <p class="section-eyebrow">Selected Works</p>
+      <h2 class="section-title">What I've Built</h2>
+    </div>
+    <p class="section-note">A collection of web experiments, AI tools, and design explorations built from scratch.</p>
+  </div>
+
+  <div class="works-grid">
+
+    <!-- 01 — Cosmos AI Studio (WIDE, flagship) -->
+    <article class="project-card wide reveal">
+      <div class="project-preview">
+        <div class="project-preview-bg g3">🤖</div>
+        <div class="project-preview-overlay"></div>
+        <span class="project-num">01</span>
+        <div class="project-tags">
+          <span class="tag">AI</span>
+          <span class="tag">Python</span>
+          <span class="tag">React</span>
+          <span class="tag">Streamlit</span>
+        </div>
+      </div>
+      <div class="project-info">
+        <div>
+          <h3 class="project-title">Cosmos 3 AI Image Studio</h3>
+          <p class="project-desc">NVIDIA-style text-to-image generation studio with Gemini prompt expansion, 6 style presets, Hugging Face multi-model switching, and a real-time lightbox gallery. Deployed on Streamlit Cloud.</p>
+        </div>
+        <a class="project-link" href="../260604/cosmos3_image_studio.html" target="_blank">
+          View Demo
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </article>
+
+    <!-- 02 — Interactive Clock -->
+    <article class="project-card reveal">
+      <div class="project-preview">
+        <div class="project-preview-bg g1">🕐</div>
+        <div class="project-preview-overlay"></div>
+        <span class="project-num">02</span>
+        <div class="project-tags">
+          <span class="tag">HTML</span>
+          <span class="tag">CSS</span>
+          <span class="tag">JavaScript</span>
+        </div>
+      </div>
+      <div class="project-info">
+        <div>
+          <h3 class="project-title">Interactive Live Clock</h3>
+          <p class="project-desc">Glassmorphic greeting page with real-time clock, ambient dynamic greetings by time-of-day, 3D tilt on hover, and dark/light theme toggle.</p>
+        </div>
+        <a class="project-link" href="../260529/index.html" target="_blank">
+          View Demo
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </article>
+
+    <!-- 03 — Consulting Landing Page -->
+    <article class="project-card reveal">
+      <div class="project-preview">
+        <div class="project-preview-bg g2">💼</div>
+        <div class="project-preview-overlay"></div>
+        <span class="project-num">03</span>
+        <div class="project-tags">
+          <span class="tag">HTML</span>
+          <span class="tag">CSS</span>
+          <span class="tag">UI Design</span>
+        </div>
+      </div>
+      <div class="project-info">
+        <div>
+          <h3 class="project-title">Consulting Landing Page</h3>
+          <p class="project-desc">Premium strategy consulting firm website with serif typography, gold accent system, animated service cards, and a full-featured contact section.</p>
+        </div>
+        <a class="project-link" href="../260529/consulting.html" target="_blank">
+          View Demo
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </article>
+
+    <!-- 04 — Travel Journal (WIDE) -->
+    <article class="project-card wide reveal">
+      <div class="project-preview">
+        <div class="project-preview-bg g5">🗺️</div>
+        <div class="project-preview-overlay"></div>
+        <span class="project-num">04</span>
+        <div class="project-tags">
+          <span class="tag">Leaflet.js</span>
+          <span class="tag">HTML</span>
+          <span class="tag">localStorage</span>
+        </div>
+      </div>
+      <div class="project-info">
+        <div>
+          <h3 class="project-title">Life Journey Map</h3>
+          <p class="project-desc">Interactive world travel journal — click anywhere on the map to pin a location, upload trip photos, and write diary entries. All data saved locally in the browser. Geocoding powered by Nominatim.</p>
+        </div>
+        <a class="project-link" href="../travel.html" target="_blank">
+          View Demo
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </article>
+
+    <!-- 05 — Video Note Helper -->
+    <article class="project-card reveal">
+      <div class="project-preview">
+        <div class="project-preview-bg g4">🎬</div>
+        <div class="project-preview-overlay"></div>
+        <span class="project-num">05</span>
+        <div class="project-tags">
+          <span class="tag">Python</span>
+          <span class="tag">Whisper</span>
+          <span class="tag">OpenCV</span>
+        </div>
+      </div>
+      <div class="project-info">
+        <div>
+          <h3 class="project-title">Video Note Helper</h3>
+          <p class="project-desc">Python CLI tool that auto-transcribes video using Faster-Whisper, captures screenshots every 30 seconds, and exports a fully-styled HTML notebook with timestamps.</p>
+        </div>
+        <a class="project-link" href="https://github.com/winnieshih1107/wi/blob/main/260602/video_note_helper.py" target="_blank">
+          View Code
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </article>
+
+    <!-- 06 — Agency Portfolio -->
+    <article class="project-card reveal">
+      <div class="project-preview">
+        <div class="project-preview-bg g6">🎨</div>
+        <div class="project-preview-overlay"></div>
+        <span class="project-num">06</span>
+        <div class="project-tags">
+          <span class="tag">HTML</span>
+          <span class="tag">CSS</span>
+          <span class="tag">Branding</span>
+        </div>
+      </div>
+      <div class="project-info">
+        <div>
+          <h3 class="project-title">Agency-Style Personal Site</h3>
+          <p class="project-desc">Bold digital-marketing agency aesthetic adapted into a personal branding site. Featuring multi-column hero layout, animated service cards, and a live contact form.</p>
+        </div>
+        <a class="project-link" href="../winnie.html" target="_blank">
+          View Demo
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </article>
+
+  </div><!-- /works-grid -->
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="reveal">
+    <p class="about-kicker">About Me</p>
+    <h2 class="about-heading">Strategy meets<br><em>curiosity</em></h2>
+    <p class="about-text">I'm Winnie — a strategist and self-taught builder exploring the intersection of AI, design, and digital products. I learn by making: each project in this portfolio started as a homework assignment and became a working demo.</p>
+    <p class="about-text">Currently diving deep into AI tooling, Python automation, and modern web interfaces. Always shipping, always curious.</p>
+    <div class="about-links">
+      <a class="about-link" href="https://github.com/winnieshih1107" target="_blank">GitHub ↗</a>
+      <a class="about-link" href="mailto:winnieshih1107@gmail.com">Email ↗</a>
+      <a class="about-link" href="../travel.html">Travel Journal ↗</a>
+    </div>
+  </div>
+
+  <div class="skills-grid reveal">
+    <div class="skill-block">
+      <div class="skill-icon">🤖</div>
+      <div class="skill-name">AI & LLM</div>
+      <div class="skill-items">Gemini API · OpenRouter · Faster-Whisper · Hugging Face · Streamlit</div>
+    </div>
+    <div class="skill-block">
+      <div class="skill-icon">🌐</div>
+      <div class="skill-name">Frontend</div>
+      <div class="skill-items">HTML · CSS · JavaScript · React · Leaflet.js · GSAP</div>
+    </div>
+    <div class="skill-block">
+      <div class="skill-icon">🐍</div>
+      <div class="skill-name">Python</div>
+      <div class="skill-items">OpenCV · PyTorch · FastAPI · Web Scraping · Data Analysis</div>
+    </div>
+    <div class="skill-block">
+      <div class="skill-icon">🎨</div>
+      <div class="skill-name">Design</div>
+      <div class="skill-items">UI/UX · Typography · Glassmorphism · Responsive Layouts</div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <p class="contact-kicker reveal">Get in Touch</p>
+  <h2 class="contact-heading reveal">Let's build<br>something <em>together.</em></h2>
+  <a class="contact-email reveal" href="mailto:winnieshih1107@gmail.com">
+    winnieshih1107@gmail.com
+  </a>
+  <div class="contact-socials reveal">
+    <a class="social-link" href="https://github.com/winnieshih1107" target="_blank">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+      GitHub
+    </a>
+    <a class="social-link" href="../travel.html">✈ Travel Journal</a>
+    <a class="social-link" href="../winnie.html">💼 Personal Site</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Winnie Shih</div>
+  <p class="footer-copy">&copy; 2026 · Built with HTML, CSS & curiosity.</p>
+  <ul class="footer-links">
+    <li><a href="#works">Works</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</footer>
+
+<script>
+// Nav scroll effect
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 40);
+}, { passive: true });
+
+// Mobile menu
+function toggleMobile() {
+  document.getElementById('mobileNav').classList.toggle('open');
+}
+
+// Scroll reveal
+const revealObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      revealObserver.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.08 });
+document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+// Stagger children of works-grid
+document.querySelectorAll('.project-card').forEach((card, i) => {
+  card.style.transitionDelay = `${(i % 2) * 0.1}s`;
+});
+</script>
+</body>
+</html>
