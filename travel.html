@@ -180,6 +180,7 @@
       font-family: var(--sans);
     }
     .btn-icon:hover { color: var(--coral); }
+    .btn-icon:first-child:hover { color: var(--teal); }
 
     /* ── MODAL ── */
     .modal-backdrop {
@@ -533,6 +534,7 @@ function buildCard(e, idx) {
       </div>
       ${e.body?`<p class="entry-text">${e.body}</p>`:''}
       <div class="entry-footer">
+        <button class="btn-icon" onclick="openEditModal(${idx})">✎ 編輯</button>
         <button class="btn-icon" onclick="deleteEntry(${idx})">✕ 刪除</button>
       </div>
     </div>
@@ -547,28 +549,53 @@ function deleteEntry(i) {
 
 // ─── ENTRY MODAL ──────────────────────────────────────────────────────
 let _draftPhotos = [];
+let _editIdx = null;
+
+function _fillModal(e) {
+  document.getElementById('e-date').value     = e.date     || '';
+  document.getElementById('e-location').value = e.location || '';
+  document.getElementById('e-lat').value      = e.lat      != null ? e.lat : '';
+  document.getElementById('e-lng').value      = e.lng      != null ? e.lng : '';
+  document.getElementById('e-emoji').value    = e.emoji    || '📍';
+  document.getElementById('e-body').value     = e.body     || '';
+  document.getElementById('geo-status').textContent = '';
+}
 
 function openEntryModal(fromMap) {
-  document.getElementById('entry-modal').classList.add('open');
-  document.getElementById('e-date').value = new Date().toISOString().slice(0,10);
-  document.getElementById('geo-status').textContent = '';
-  if (fromMap && _clickLat!=null) {
+  _editIdx = null;
+  document.querySelector('#entry-modal .modal-title').textContent = '✏️ 新增旅行日誌';
+  document.querySelector('#entry-modal .btn-submit').textContent  = '儲存日誌';
+  _draftPhotos = [];
+  renderDraftThumbs();
+  _fillModal({ date: new Date().toISOString().slice(0,10) });
+  if (fromMap && _clickLat != null) {
     document.getElementById('e-lat').value = _clickLat;
     document.getElementById('e-lng').value = _clickLng;
     reverseGeocode(_clickLat, _clickLng);
   }
+  document.getElementById('entry-modal').classList.add('open');
+}
+
+function openEditModal(idx) {
+  _editIdx = idx;
+  const e = entries[idx];
+  document.querySelector('#entry-modal .modal-title').textContent = '✎ 編輯旅行日誌';
+  document.querySelector('#entry-modal .btn-submit').textContent  = '更新日誌';
+  _draftPhotos = [...(e.photos || [])];
+  renderDraftThumbs();
+  _fillModal(e);
+  document.getElementById('entry-modal').classList.add('open');
 }
 
 function closeModal() {
   document.getElementById('entry-modal').classList.remove('open');
-  _draftPhotos = [];
+  _draftPhotos = []; _editIdx = null;
   document.getElementById('draft-thumbs').innerHTML = '';
   document.getElementById('draft-photo-input').value = '';
-  ['e-date','e-location','e-title','e-body','e-lat','e-lng'].forEach(id=>{
-    const el=document.getElementById(id); if(el) el.value='';
+  ['e-date','e-location','e-body','e-lat','e-lng'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
   });
   document.getElementById('e-emoji').value = '📍';
-  document.getElementById('e-tag').value   = 'travel';
   document.getElementById('geo-status').textContent = '';
   _clickLat = _clickLng = null;
 }
@@ -599,18 +626,22 @@ function removeDraft(i) { _draftPhotos.splice(i,1); renderDraftThumbs(); }
 function saveEntry() {
   const date     = document.getElementById('e-date').value;
   const location = document.getElementById('e-location').value.trim();
-  const title    = document.getElementById('e-title').value.trim();
   const body     = document.getElementById('e-body').value.trim();
   const lat      = parseFloat(document.getElementById('e-lat').value);
   const lng      = parseFloat(document.getElementById('e-lng').value);
-  const tag      = document.getElementById('e-tag').value;
   const emoji    = document.getElementById('e-emoji').value.trim() || '📍';
   if (!date) { alert('請填寫日期'); return; }
-  entries.push({
-    id: uid(), date, location, emoji,
-    lat: isNaN(lat)?null:lat, lng: isNaN(lng)?null:lng,
-    tag, title, body, photos: [..._draftPhotos]
-  });
+  const data = {
+    date, location, emoji,
+    lat: isNaN(lat) ? null : lat,
+    lng: isNaN(lng) ? null : lng,
+    body, photos: [..._draftPhotos]
+  };
+  if (_editIdx !== null) {
+    entries[_editIdx] = { ...entries[_editIdx], ...data };
+  } else {
+    entries.push({ id: uid(), ...data });
+  }
   persist(); renderMap(); renderTimeline();
   closeModal();
 }
