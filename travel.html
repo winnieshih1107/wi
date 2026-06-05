@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Winnie's Life Journey | 人生旅行地圖</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    :root {
+      --cream: #FAF7F2;
+      --dark:  #1A1A1A;
+      --brown: #3D2B1F;
+      --coral: #E8614A;
+      --teal:  #2E9E8F;
+      --gold:  #D4A853;
+      --sand:  #EDE0CC;
+      --serif: 'Playfair Display', Georgia, serif;
+      --sans:  'Inter', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--sans); background: var(--cream); color: var(--dark); overflow-x: hidden; }
+    a { text-decoration: none; color: inherit; }
+    ul { list-style: none; }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+      background: rgba(250,247,242,0.95); backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(61,43,31,0.1);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 5%; height: 68px;
+    }
+    .nav-logo {
+      font-family: var(--serif); font-size: 1.3rem; font-weight: 700;
+      color: var(--brown); display: flex; align-items: center; gap: 8px;
+    }
+    .nav-logo span { font-size: 1.4rem; }
+    .nav-links { display: flex; gap: 2rem; align-items: center; }
+    .nav-links a {
+      font-size: 0.8rem; font-weight: 500; letter-spacing: 0.1em;
+      text-transform: uppercase; color: rgba(61,43,31,0.6); transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--coral); }
+    .nav-add {
+      display: flex; gap: 0.75rem;
+    }
+    .btn-nav {
+      padding: 0.5rem 1.1rem; border-radius: 2px;
+      font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; cursor: pointer; transition: all 0.2s; border: none;
+    }
+    .btn-coral { background: var(--coral); color: #fff; }
+    .btn-coral:hover { background: #d44f38; }
+    .btn-teal  { background: var(--teal);  color: #fff; }
+    .btn-teal:hover  { background: #26897b; }
+
+    /* ── HERO ── */
+    .hero {
+      margin-top: 68px;
+      min-height: 92vh;
+      position: relative; overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(160deg, #1a1a1a 0%, #3d2b1f 40%, #6b3c28 70%, #e8614a 100%);
+    }
+    .hero-bg-text {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--serif); font-size: clamp(8rem, 20vw, 18rem); font-weight: 900;
+      color: rgba(255,255,255,0.03); white-space: nowrap; user-select: none;
+      letter-spacing: -0.05em;
+    }
+    .hero-content { position: relative; text-align: center; padding: 2rem; }
+    .hero-eyebrow {
+      font-size: 0.75rem; font-weight: 600; letter-spacing: 0.3em;
+      text-transform: uppercase; color: var(--gold); margin-bottom: 1.5rem;
+      display: flex; align-items: center; justify-content: center; gap: 12px;
+    }
+    .hero-eyebrow::before, .hero-eyebrow::after {
+      content: ''; width: 40px; height: 1px; background: var(--gold); opacity: 0.5;
+    }
+    .hero-title {
+      font-family: var(--serif); font-size: clamp(3rem, 8vw, 6rem);
+      font-weight: 900; line-height: 1.0; color: #fff;
+      margin-bottom: 1.5rem; letter-spacing: -0.02em;
+    }
+    .hero-title em { font-style: italic; font-weight: 400; color: var(--gold); }
+    .hero-sub {
+      font-size: 1.1rem; color: rgba(255,255,255,0.65); max-width: 520px; margin: 0 auto 3rem;
+      line-height: 1.7;
+    }
+    .hero-stats {
+      display: flex; gap: 3rem; justify-content: center; flex-wrap: wrap;
+    }
+    .hero-stat { text-align: center; }
+    .hero-stat-num {
+      font-family: var(--serif); font-size: 2.5rem; font-weight: 700;
+      color: #fff; line-height: 1;
+    }
+    .hero-stat-label {
+      font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase;
+      color: rgba(255,255,255,0.5); margin-top: 4px;
+    }
+    .hero-scroll {
+      position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+    }
+    .hero-scroll::after {
+      content: ''; width: 1px; height: 40px;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.4), transparent);
+    }
+
+    /* ── SECTION WRAPPER ── */
+    .section { padding: 6rem 5%; }
+    .section-alt { background: var(--sand); }
+    .section-dark { background: var(--dark); }
+    .section-label {
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.25em;
+      text-transform: uppercase; margin-bottom: 0.75rem;
+    }
+    .section-label.coral { color: var(--coral); }
+    .section-label.teal  { color: var(--teal); }
+    .section-label.gold  { color: var(--gold); }
+    .section-heading {
+      font-family: var(--serif); font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 900; line-height: 1.1; letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+    }
+    .section-heading.light { color: #fff; }
+    .section-sub { font-size: 1rem; color: #777; line-height: 1.7; max-width: 540px; }
+    .section-sub.light { color: rgba(255,255,255,0.55); }
+    .section-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 3rem; gap: 2rem; flex-wrap: wrap; }
+
+    /* ── MAP ── */
+    #map-section { padding: 0; }
+    .map-header { padding: 4rem 5% 2rem; }
+    #world-map {
+      width: 100%; height: 520px;
+      border-top: 4px solid var(--coral);
+    }
+    .map-hint {
+      background: var(--dark); color: rgba(255,255,255,0.5);
+      padding: 0.75rem 5%; font-size: 0.8rem; letter-spacing: 0.05em;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .pin-list {
+      padding: 2rem 5% 4rem;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem;
+    }
+    .pin-card {
+      background: #fff; border-radius: 4px; padding: 1rem 1.25rem;
+      border-left: 3px solid var(--coral);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      display: flex; flex-direction: column; gap: 4px;
+      position: relative;
+    }
+    .pin-card-flag { font-size: 1.4rem; }
+    .pin-card-name { font-weight: 700; font-size: 0.95rem; }
+    .pin-card-date { font-size: 0.75rem; color: #999; }
+    .pin-card-note { font-size: 0.8rem; color: #555; margin-top: 4px; line-height: 1.5; }
+    .pin-card-del {
+      position: absolute; top: 8px; right: 8px;
+      background: none; border: none; cursor: pointer;
+      color: #ccc; font-size: 0.9rem; line-height: 1;
+      transition: color 0.2s;
+    }
+    .pin-card-del:hover { color: var(--coral); }
+
+    /* ── PHOTOS ── */
+    .photo-upload-area {
+      border: 2px dashed rgba(61,43,31,0.2);
+      border-radius: 4px; padding: 2.5rem;
+      text-align: center; cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      margin-bottom: 2rem;
+    }
+    .photo-upload-area:hover { border-color: var(--coral); background: rgba(232,97,74,0.03); }
+    .photo-upload-area p { font-size: 0.9rem; color: #999; margin-top: 0.5rem; }
+    .photo-upload-area .upload-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+    #photo-input { display: none; }
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 12px;
+    }
+    .photo-card {
+      position: relative; border-radius: 4px; overflow: hidden;
+      aspect-ratio: 4/3; background: #eee; cursor: pointer;
+      group: true;
+    }
+    .photo-card img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform 0.4s;
+    }
+    .photo-card:hover img { transform: scale(1.05); }
+    .photo-card-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 50%);
+      opacity: 0; transition: opacity 0.3s;
+      display: flex; flex-direction: column; justify-content: flex-end; padding: 1rem;
+    }
+    .photo-card:hover .photo-card-overlay { opacity: 1; }
+    .photo-card-caption { color: #fff; font-size: 0.85rem; font-weight: 600; }
+    .photo-card-location { color: rgba(255,255,255,0.7); font-size: 0.75rem; margin-top: 2px; }
+    .photo-card-del {
+      position: absolute; top: 8px; right: 8px;
+      background: rgba(0,0,0,0.5); border: none; border-radius: 50%;
+      color: #fff; width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; opacity: 0; transition: opacity 0.3s; font-size: 0.9rem;
+    }
+    .photo-card:hover .photo-card-del { opacity: 1; }
+    .photo-empty {
+      grid-column: 1/-1; text-align: center;
+      padding: 4rem 2rem; color: #bbb; font-size: 0.95rem;
+    }
+    .photo-empty .icon { font-size: 3rem; margin-bottom: 0.75rem; }
+
+    /* ── JOURNAL ── */
+    .journal-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+    .journal-card {
+      background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 4px; padding: 1.75rem;
+      transition: background 0.2s, transform 0.2s;
+      position: relative;
+    }
+    .journal-card:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); }
+    .journal-card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1rem; }
+    .journal-card-meta { display: flex; flex-direction: column; gap: 3px; }
+    .journal-card-date { font-size: 0.7rem; color: var(--gold); letter-spacing: 0.1em; text-transform: uppercase; }
+    .journal-card-loc  { font-size: 0.8rem; color: rgba(255,255,255,0.5); }
+    .journal-card-del {
+      background: none; border: none; cursor: pointer;
+      color: rgba(255,255,255,0.2); font-size: 0.9rem; transition: color 0.2s;
+    }
+    .journal-card-del:hover { color: var(--coral); }
+    .journal-card-title {
+      font-family: var(--serif); font-size: 1.3rem; font-weight: 700;
+      color: #fff; margin-bottom: 0.75rem; line-height: 1.3;
+    }
+    .journal-card-body { font-size: 0.875rem; line-height: 1.75; color: rgba(255,255,255,0.55); }
+    .journal-card-tag {
+      display: inline-block; margin-top: 1rem;
+      padding: 0.2rem 0.6rem; border-radius: 2px;
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    }
+    .tag-travel { background: rgba(232,97,74,0.2); color: var(--coral); }
+    .tag-life   { background: rgba(46,158,143,0.2); color: var(--teal); }
+    .tag-food   { background: rgba(212,168,83,0.2); color: var(--gold); }
+    .journal-empty {
+      grid-column: 1/-1; text-align: center;
+      padding: 4rem 2rem; color: rgba(255,255,255,0.25); font-size: 0.95rem;
+    }
+    .journal-empty .icon { font-size: 3rem; margin-bottom: 0.75rem; }
+
+    /* ── MODAL ── */
+    .modal-backdrop {
+      display: none; position: fixed; inset: 0; z-index: 900;
+      background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+      align-items: center; justify-content: center; padding: 1rem;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal {
+      background: var(--cream); border-radius: 4px;
+      width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+      animation: modalIn 0.25s ease;
+    }
+    @keyframes modalIn { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform: translateY(0); } }
+    .modal-header {
+      padding: 1.75rem 2rem 1.25rem;
+      border-bottom: 1px solid rgba(61,43,31,0.1);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .modal-title { font-family: var(--serif); font-size: 1.4rem; font-weight: 700; }
+    .modal-close {
+      background: none; border: none; cursor: pointer;
+      font-size: 1.5rem; color: #999; transition: color 0.2s; line-height: 1;
+    }
+    .modal-close:hover { color: var(--coral); }
+    .modal-body { padding: 1.5rem 2rem 2rem; display: flex; flex-direction: column; gap: 1rem; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-label { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #888; }
+    .form-input, .form-textarea, .form-select {
+      padding: 0.75rem 1rem;
+      border: 1.5px solid rgba(61,43,31,0.15); border-radius: 2px;
+      font-size: 0.95rem; font-family: inherit; color: var(--dark);
+      background: #fff; outline: none; transition: border-color 0.2s;
+    }
+    .form-input:focus, .form-textarea:focus, .form-select:focus { border-color: var(--coral); }
+    .form-textarea { height: 110px; resize: none; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .btn-submit {
+      padding: 0.85rem 2rem; background: var(--coral); color: #fff;
+      border: none; border-radius: 2px; cursor: pointer;
+      font-size: 0.85rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+      transition: background 0.2s; margin-top: 0.5rem;
+    }
+    .btn-submit:hover { background: #d44f38; }
+
+    /* Photo modal */
+    .photo-modal .modal { max-width: 460px; }
+    .photo-preview-area {
+      border: 2px dashed rgba(61,43,31,0.2); border-radius: 4px;
+      padding: 2rem; text-align: center; cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .photo-preview-area:hover { border-color: var(--teal); }
+    #modal-photo-input { display: none; }
+    #preview-img { max-width: 100%; max-height: 200px; border-radius: 4px; margin-top: 1rem; display: none; }
+
+    /* Lightbox */
+    .lightbox {
+      display: none; position: fixed; inset: 0; z-index: 1000;
+      background: rgba(0,0,0,0.92); align-items: center; justify-content: center;
+    }
+    .lightbox.open { display: flex; }
+    .lightbox img { max-width: 90vw; max-height: 85vh; object-fit: contain; border-radius: 2px; }
+    .lightbox-close {
+      position: absolute; top: 1.5rem; right: 2rem;
+      color: rgba(255,255,255,0.7); font-size: 2rem;
+      cursor: pointer; background: none; border: none; transition: color 0.2s;
+    }
+    .lightbox-close:hover { color: #fff; }
+    .lightbox-caption {
+      position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+      color: rgba(255,255,255,0.7); font-size: 0.9rem; text-align: center;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--brown); padding: 2.5rem 5%;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+    }
+    .footer-brand { font-family: var(--serif); font-size: 1.1rem; color: #fff; }
+    .footer-copy { font-size: 0.75rem; color: rgba(255,255,255,0.35); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .nav-add .btn-nav { font-size: 0.7rem; padding: 0.45rem 0.8rem; }
+      .hero-stats { gap: 2rem; }
+      #world-map { height: 350px; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 480px) {
+      .section { padding: 4rem 4%; }
+      .modal-body { padding: 1.25rem; }
+    }
+
+    /* Leaflet custom marker */
+    .custom-marker {
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo"><span>✈</span> Winnie's Journey</div>
+  <ul class="nav-links">
+    <li><a href="#map-section">地圖</a></li>
+    <li><a href="#photos">相片</a></li>
+    <li><a href="#journal">日記</a></li>
+  </ul>
+  <div class="nav-add">
+    <button class="btn-nav btn-coral" onclick="openPinModal()">📍 插旗</button>
+    <button class="btn-nav btn-teal" onclick="openPhotoModal()">📷 加照片</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-text">JOURNEY</div>
+  <div class="hero-content">
+    <p class="hero-eyebrow">Winnie Shih · 人生旅行地圖</p>
+    <h1 class="hero-title">Life Is A<br><em>Journey</em></h1>
+    <p class="hero-sub">記錄每一個足跡、每一張笑臉、每一段故事。<br>這裡是我的人生地圖。</p>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-num" id="stat-countries">0</div>
+        <div class="hero-stat-label">旅遊地點</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num" id="stat-photos">0</div>
+        <div class="hero-stat-label">張照片</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num" id="stat-journals">0</div>
+        <div class="hero-stat-label">篇日記</div>
+      </div>
+    </div>
+  </div>
+  <div class="hero-scroll">Scroll</div>
+</section>
+
+<!-- MAP -->
+<section id="map-section">
+  <div class="map-header">
+    <p class="section-label coral">World Map</p>
+    <div class="section-header" style="margin-bottom:0">
+      <div>
+        <h2 class="section-heading">我去過的地方</h2>
+        <p class="section-sub">點擊地圖上任意位置插旗，記錄你的足跡。</p>
+      </div>
+      <button class="btn-nav btn-coral" style="flex-shrink:0" onclick="openPinModal()">📍 新增地點</button>
+    </div>
+  </div>
+  <div id="world-map"></div>
+  <div class="map-hint">💡 點擊地圖可直接插旗，或使用「插旗」按鈕手動輸入座標</div>
+  <div class="pin-list" id="pin-list"></div>
+</section>
+
+<!-- PHOTOS -->
+<section id="photos" class="section section-alt">
+  <div class="section-header">
+    <div>
+      <p class="section-label teal">Gallery</p>
+      <h2 class="section-heading">旅行相簿</h2>
+      <p class="section-sub">記錄每一個珍貴瞬間。</p>
+    </div>
+    <button class="btn-nav btn-teal" onclick="openPhotoModal()">📷 新增照片</button>
+  </div>
+  <div class="photo-upload-area" onclick="document.getElementById('photo-input').click()">
+    <div class="upload-icon">🖼</div>
+    <strong>點擊上傳照片</strong>
+    <p>支援 JPG、PNG、WebP，照片儲存在瀏覽器本地</p>
+    <input type="file" id="photo-input" accept="image/*" multiple onchange="handlePhotoFiles(this.files)" />
+  </div>
+  <div class="photo-grid" id="photo-grid"></div>
+</section>
+
+<!-- JOURNAL -->
+<section id="journal" class="section section-dark">
+  <div class="section-header">
+    <div>
+      <p class="section-label gold">Journal</p>
+      <h2 class="section-heading light">人生文字記錄</h2>
+      <p class="section-sub light">寫下那些說不盡的故事。</p>
+    </div>
+    <button class="btn-nav btn-coral" onclick="openJournalModal()">✏️ 新增日記</button>
+  </div>
+  <div class="journal-grid" id="journal-grid"></div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">✈ Winnie's Life Journey</div>
+  <p class="footer-copy">&copy; 2026 Winnie Shih · 所有照片與文字版權所有</p>
+</footer>
+
+<!-- MODAL: PIN -->
+<div class="modal-backdrop" id="pin-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title">📍 插旗 — 新增地點</h3>
+      <button class="modal-close" onclick="closeModal('pin-modal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">地點名稱 *</label>
+          <input class="form-input" id="pin-name" placeholder="例：東京、巴黎、台北" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Emoji 旗幟</label>
+          <input class="form-input" id="pin-emoji" placeholder="📍" value="📍" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">緯度（Lat）</label>
+          <input class="form-input" id="pin-lat" placeholder="35.6762" type="number" step="any" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">經度（Lng）</label>
+          <input class="form-input" id="pin-lng" placeholder="139.6503" type="number" step="any" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">造訪日期</label>
+        <input class="form-input" id="pin-date" type="date" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">備註</label>
+        <textarea class="form-textarea" id="pin-note" placeholder="這趟旅行最難忘的是…"></textarea>
+      </div>
+      <p style="font-size:0.75rem;color:#aaa">💡 也可以直接在地圖上點擊來快速插旗</p>
+      <button class="btn-submit" onclick="savePin()">儲存地點</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: PHOTO -->
+<div class="modal-backdrop photo-modal" id="photo-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title">📷 新增照片</h3>
+      <button class="modal-close" onclick="closeModal('photo-modal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">選擇照片 *</label>
+        <div class="photo-preview-area" onclick="document.getElementById('modal-photo-input').click()">
+          <div style="font-size:2rem;margin-bottom:0.5rem">🖼</div>
+          <strong>點擊選擇圖片</strong>
+          <p style="font-size:0.8rem;color:#aaa;margin-top:4px">JPG / PNG / WebP</p>
+          <input type="file" id="modal-photo-input" accept="image/*" onchange="previewPhoto(this)" />
+          <img id="preview-img" alt="preview" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">標題</label>
+        <input class="form-input" id="photo-caption" placeholder="這張照片的故事…" />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">地點</label>
+          <input class="form-input" id="photo-location" placeholder="東京, 日本" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">日期</label>
+          <input class="form-input" id="photo-date" type="date" />
+        </div>
+      </div>
+      <button class="btn-submit" style="background:var(--teal)" onclick="savePhoto()">儲存照片</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: JOURNAL -->
+<div class="modal-backdrop" id="journal-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title">✏️ 新增日記</h3>
+      <button class="modal-close" onclick="closeModal('journal-modal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">標題 *</label>
+        <input class="form-input" id="j-title" placeholder="這一天，我想說的是…" />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">地點</label>
+          <input class="form-input" id="j-loc" placeholder="東京, 日本" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">日期</label>
+          <input class="form-input" id="j-date" type="date" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">分類</label>
+        <select class="form-select" id="j-tag">
+          <option value="travel">✈ 旅行</option>
+          <option value="life">💛 生活</option>
+          <option value="food">🍜 美食</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">內文 *</label>
+        <textarea class="form-textarea" id="j-body" placeholder="寫下你的故事…" style="height:160px"></textarea>
+      </div>
+      <button class="btn-submit" onclick="saveJournal()">儲存日記</button>
+    </div>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+  <img id="lightbox-img" src="" alt="" />
+  <div class="lightbox-caption" id="lightbox-cap"></div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────
+let pins     = JSON.parse(localStorage.getItem('wj_pins')    || '[]');
+let photos   = JSON.parse(localStorage.getItem('wj_photos')  || '[]');
+let journals = JSON.parse(localStorage.getItem('wj_journals')|| '[]');
+
+function save() {
+  localStorage.setItem('wj_pins',     JSON.stringify(pins));
+  localStorage.setItem('wj_photos',   JSON.stringify(photos));
+  localStorage.setItem('wj_journals', JSON.stringify(journals));
+  updateStats();
+}
+
+function updateStats() {
+  document.getElementById('stat-countries').textContent = pins.length;
+  document.getElementById('stat-photos').textContent    = photos.length;
+  document.getElementById('stat-journals').textContent  = journals.length;
+}
+
+// ── MAP ───────────────────────────────────────────────────────────────
+const map = L.map('world-map', {
+  center: [20, 10], zoom: 2,
+  minZoom: 2, maxZoom: 12,
+  zoomControl: true
+});
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© OpenStreetMap contributors'
+}).addTo(map);
+
+const markerGroup = L.layerGroup().addTo(map);
+
+function makeIcon(emoji) {
+  return L.divIcon({
+    html: `<div class="custom-marker">${emoji || '📍'}</div>`,
+    iconSize: [36, 36], iconAnchor: [18, 36], popupAnchor: [0, -36],
+    className: ''
+  });
+}
+
+function renderPins() {
+  markerGroup.clearLayers();
+  pins.forEach((p, i) => {
+    if (p.lat == null || p.lng == null) return;
+    const marker = L.marker([p.lat, p.lng], { icon: makeIcon(p.emoji) });
+    marker.bindPopup(`
+      <strong>${p.emoji || '📍'} ${p.name}</strong><br>
+      ${p.date ? `<small>${p.date}</small><br>` : ''}
+      ${p.note ? `<p style="margin-top:4px;font-size:0.85rem">${p.note}</p>` : ''}
+      <button onclick="deletePin(${i})" style="margin-top:6px;font-size:0.75rem;color:#e8614a;background:none;border:none;cursor:pointer">刪除</button>
+    `);
+    marker.addTo(markerGroup);
+  });
+  renderPinList();
+}
+
+function renderPinList() {
+  const el = document.getElementById('pin-list');
+  if (!pins.length) { el.innerHTML = ''; return; }
+  el.innerHTML = pins.map((p, i) => `
+    <div class="pin-card">
+      <button class="pin-card-del" onclick="deletePin(${i})" title="刪除">✕</button>
+      <div class="pin-card-flag">${p.emoji || '📍'}</div>
+      <div class="pin-card-name">${p.name}</div>
+      ${p.date ? `<div class="pin-card-date">${p.date}</div>` : ''}
+      ${p.note ? `<div class="pin-card-note">${p.note}</div>` : ''}
+    </div>
+  `).join('');
+}
+
+map.on('click', function(e) {
+  document.getElementById('pin-lat').value = e.latlng.lat.toFixed(4);
+  document.getElementById('pin-lng').value = e.latlng.lng.toFixed(4);
+  openPinModal();
+});
+
+function savePin() {
+  const name  = document.getElementById('pin-name').value.trim();
+  const emoji = document.getElementById('pin-emoji').value.trim() || '📍';
+  const lat   = parseFloat(document.getElementById('pin-lat').value);
+  const lng   = parseFloat(document.getElementById('pin-lng').value);
+  const date  = document.getElementById('pin-date').value;
+  const note  = document.getElementById('pin-note').value.trim();
+  if (!name) { alert('請填寫地點名稱'); return; }
+  pins.push({ name, emoji, lat: isNaN(lat)?null:lat, lng: isNaN(lng)?null:lng, date, note });
+  save(); renderPins();
+  closeModal('pin-modal');
+  resetForm(['pin-name','pin-emoji','pin-lat','pin-lng','pin-date','pin-note']);
+  document.getElementById('pin-emoji').value = '📍';
+}
+
+function deletePin(i) {
+  if (!confirm('確定刪除這個地點？')) return;
+  pins.splice(i, 1); save(); renderPins();
+}
+
+// ── PHOTOS ────────────────────────────────────────────────────────────
+function renderPhotos() {
+  const grid = document.getElementById('photo-grid');
+  if (!photos.length) {
+    grid.innerHTML = `<div class="photo-empty"><div class="icon">📷</div>還沒有照片，點擊上方新增吧！</div>`;
+    return;
+  }
+  grid.innerHTML = photos.map((p, i) => `
+    <div class="photo-card" onclick="openLightbox(${i})">
+      <img src="${p.src}" alt="${p.caption||''}" loading="lazy" />
+      <div class="photo-card-overlay">
+        ${p.caption   ? `<div class="photo-card-caption">${p.caption}</div>` : ''}
+        ${p.location  ? `<div class="photo-card-location">📍 ${p.location}</div>` : ''}
+      </div>
+      <button class="photo-card-del" onclick="event.stopPropagation();deletePhoto(${i})" title="刪除">✕</button>
+    </div>
+  `).join('');
+}
+
+async function resizeImage(file, maxW = 1200) {
+  return new Promise(resolve => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      const scale = Math.min(1, maxW / img.width);
+      const canvas = document.createElement('canvas');
+      canvas.width  = Math.round(img.width  * scale);
+      canvas.height = Math.round(img.height * scale);
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(url);
+      resolve(canvas.toDataURL('image/jpeg', 0.82));
+    };
+    img.src = url;
+  });
+}
+
+async function handlePhotoFiles(files) {
+  for (const file of files) {
+    const src = await resizeImage(file);
+    photos.push({ src, caption: '', location: '', date: '' });
+  }
+  save(); renderPhotos();
+}
+
+let modalPhotoSrc = null;
+function previewPhoto(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    modalPhotoSrc = e.target.result;
+    const img = document.getElementById('preview-img');
+    img.src = modalPhotoSrc; img.style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+async function savePhoto() {
+  const input = document.getElementById('modal-photo-input');
+  let src = modalPhotoSrc;
+  if (!src && input.files[0]) {
+    src = await resizeImage(input.files[0]);
+  }
+  if (!src) { alert('請選擇照片'); return; }
+  photos.push({
+    src,
+    caption:  document.getElementById('photo-caption').value.trim(),
+    location: document.getElementById('photo-location').value.trim(),
+    date:     document.getElementById('photo-date').value
+  });
+  save(); renderPhotos();
+  closeModal('photo-modal');
+  modalPhotoSrc = null;
+  document.getElementById('preview-img').style.display = 'none';
+  resetForm(['photo-caption','photo-location','photo-date']);
+  input.value = '';
+}
+
+function deletePhoto(i) {
+  if (!confirm('確定刪除這張照片？')) return;
+  photos.splice(i, 1); save(); renderPhotos();
+}
+
+function openLightbox(i) {
+  const p = photos[i];
+  document.getElementById('lightbox-img').src = p.src;
+  document.getElementById('lightbox-cap').textContent =
+    [p.caption, p.location ? '📍 ' + p.location : '', p.date].filter(Boolean).join('  ·  ');
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// ── JOURNAL ───────────────────────────────────────────────────────────
+const tagMap = {
+  travel: { label: '✈ 旅行', cls: 'tag-travel' },
+  life:   { label: '💛 生活', cls: 'tag-life'   },
+  food:   { label: '🍜 美食', cls: 'tag-food'   }
+};
+
+function renderJournals() {
+  const grid = document.getElementById('journal-grid');
+  if (!journals.length) {
+    grid.innerHTML = `<div class="journal-empty"><div class="icon">📖</div>還沒有日記，點擊右上角開始記錄吧！</div>`;
+    return;
+  }
+  grid.innerHTML = [...journals].reverse().map((j, ri) => {
+    const i = journals.length - 1 - ri;
+    const t = tagMap[j.tag] || tagMap.travel;
+    return `
+      <div class="journal-card">
+        <div class="journal-card-header">
+          <div class="journal-card-meta">
+            <div class="journal-card-date">${j.date || '未記錄日期'}</div>
+            ${j.loc ? `<div class="journal-card-loc">📍 ${j.loc}</div>` : ''}
+          </div>
+          <button class="journal-card-del" onclick="deleteJournal(${i})" title="刪除">✕</button>
+        </div>
+        <h3 class="journal-card-title">${j.title}</h3>
+        <p class="journal-card-body">${j.body.replace(/\n/g,'<br>')}</p>
+        <span class="journal-card-tag ${t.cls}">${t.label}</span>
+      </div>
+    `;
+  }).join('');
+}
+
+function saveJournal() {
+  const title = document.getElementById('j-title').value.trim();
+  const body  = document.getElementById('j-body').value.trim();
+  if (!title || !body) { alert('請填寫標題與內文'); return; }
+  journals.push({
+    title, body,
+    loc:  document.getElementById('j-loc').value.trim(),
+    date: document.getElementById('j-date').value,
+    tag:  document.getElementById('j-tag').value
+  });
+  save(); renderJournals();
+  closeModal('journal-modal');
+  resetForm(['j-title','j-loc','j-date','j-body']);
+}
+
+function deleteJournal(i) {
+  if (!confirm('確定刪除這篇日記？')) return;
+  journals.splice(i, 1); save(); renderJournals();
+}
+
+// ── MODALS ────────────────────────────────────────────────────────────
+function openPinModal()     { document.getElementById('pin-modal').classList.add('open'); }
+function openPhotoModal()   { document.getElementById('photo-modal').classList.add('open'); }
+function openJournalModal() {
+  document.getElementById('journal-modal').classList.add('open');
+  if (!document.getElementById('j-date').value)
+    document.getElementById('j-date').value = new Date().toISOString().slice(0,10);
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+document.querySelectorAll('.modal-backdrop').forEach(b => {
+  b.addEventListener('click', e => { if (e.target === b) b.classList.remove('open'); });
+});
+
+function resetForm(ids) { ids.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; }); }
+
+// ── INIT ──────────────────────────────────────────────────────────────
+renderPins();
+renderPhotos();
+renderJournals();
+updateStats();
+</script>
+</body>
+</html>
