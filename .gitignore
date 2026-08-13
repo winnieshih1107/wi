@@ -2,3 +2,20 @@
 .DS_Store
 Thumbs.db
 Desktop.ini
+
+# 🔒 憑證與金鑰 —— 絕不可上傳
+credentials.json
+token.json
+*.credentials.json
+.env
+.env.*
+openclaw.json
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Node
+node_modules/

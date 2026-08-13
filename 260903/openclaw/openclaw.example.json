@@ -1,0 +1,70 @@
+// 「龍蝦」養成班 — OpenClaw 串接本地 Ollama 設定範本
+//
+// 使用方式：
+//   1. 開啟你的設定檔  ~/.openclaw/openclaw.json
+//      （Windows: %USERPROFILE%\.openclaw\openclaw.json）
+//   2. 把下面的 models / agents 區塊「合併」進去 —— 不是整檔覆蓋，
+//      onboard 精靈已經寫好的其他設定請保留。
+//   3. 設環境變數：  export OLLAMA_API_KEY="ollama-local"
+//   4. 重啟：        openclaw gateway restart
+//   5. 確認：        openclaw gateway status
+//
+// ⚠️ 兩個最常見的坑
+//   1) baseUrl 不要加 /v1。用原生端點 http://127.0.0.1:11434。
+//      加了 /v1 會破壞 tool calling，模型會把工具呼叫的 JSON 當純文字吐出來。
+//   2) models 陣列沒列到的模型會噴 model not allowed，
+//      id 必須跟 `ollama list` 顯示的完全一致（含 :8b 標籤）。
+{
+  "models": {
+    "providers": {
+      "ollama": {
+        // 本機 Ollama。跑在另一台機器就改成 http://<內網IP>:11434
+        "baseUrl": "http://127.0.0.1:11434",
+
+        // 這裡填的是「環境變數名稱」，不是金鑰本身。
+        // Ollama 不驗證金鑰，但 OpenClaw 的 provider 層沒有它會拒絕載入。
+        "apiKey": "OLLAMA_API_KEY",
+
+        "api": "ollama",
+
+        // 本地模型比雲端慢很多，逾時要放寬，否則長回應會被中斷
+        "timeoutSeconds": 300,
+
+        "contextWindow": 32768,
+        "maxTokens": 8192,
+
+        "models": [
+          {
+            // 主力：支援 tool calling，16GB RAM 跑得動
+            "id": "qwen3:8b",
+            "name": "qwen3:8b",
+            "input": ["text"],
+            "params": {
+              "num_ctx": 32768,      // Ollama 端的實際上下文長度
+              "keep_alive": "15m"    // 模型留在記憶體 15 分鐘，避免每次重載
+            }
+          },
+          {
+            // 備援：記憶體吃緊或 8B 太慢時切這個
+            "id": "llama3.2:3b",
+            "name": "llama3.2:3b",
+            "input": ["text"],
+            "params": {
+              "num_ctx": 8192,
+              "keep_alive": "5m"
+            }
+          }
+        ]
+      }
+    }
+  },
+
+  "agents": {
+    "defaults": {
+      "model": {
+        // 格式是 <provider>/<model id>
+        "primary": "ollama/qwen3:8b"
+      }
+    }
+  }
+}
